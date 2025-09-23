@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, MessageCircle, Send, User } from 'lucide-react';
+import { X, MessageCircle, Send, User, Phone, Video, Info, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -141,49 +141,69 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60);
 
-    if (diffInHours < 1) {
-      return 'Just now';
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`;
+    if (diffInMinutes < 1) {
+      return 'now';
+    } else if (diffInMinutes < 60) {
+      return `${Math.floor(diffInMinutes)}m`;
+    } else if (diffInMinutes < 1440) {
+      return `${Math.floor(diffInMinutes / 60)}h`;
     } else {
-      return date.toLocaleDateString();
+      return `${Math.floor(diffInMinutes / 1440)}d`;
     }
+  };
+
+  const formatMessageTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-4xl h-[600px] mx-auto flex">
-        {/* Conversations List */}
-        <div className="w-1/3 border-r">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Messages</CardTitle>
-              <Button variant="ghost" size="sm" onClick={onClose}>
-                <X className="h-4 w-4" />
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="w-full max-w-4xl h-[600px] mx-auto bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-2xl flex">
+        {/* Conversations List - Instagram Style */}
+        <div className="w-1/3 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+          {/* Header */}
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-white text-sm">
+                    {currentUser?.fullName?.split(' ').map((n: string) => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <h2 className="text-xl font-semibold">{currentUser?.fullName?.split(' ')[0]}</h2>
+              </div>
+              <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <X className="h-5 w-5" />
               </Button>
             </div>
-            {getTotalUnreadCount() > 0 && (
-              <Badge variant="secondary" className="w-fit">
-                {getTotalUnreadCount()} unread
-              </Badge>
-            )}
-          </CardHeader>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input 
+                placeholder="Search" 
+                className="pl-10 bg-gray-100 dark:bg-gray-800 border-none rounded-lg"
+              />
+            </div>
+          </div>
           
-          <ScrollArea className="h-[500px]">
-            <div className="p-4 pt-0 space-y-2">
+          {/* Conversations */}
+          <ScrollArea className="h-[490px]">
+            <div className="p-0">
               {conversations.length === 0 ? (
-                <div className="text-center text-muted-foreground py-8">
-                  <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>No conversations yet</p>
-                  <p className="text-sm">Start connecting with people!</p>
+                <div className="text-center text-gray-500 py-16">
+                  <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-lg font-medium">Your Messages</p>
+                  <p className="text-sm">Send private messages to friends</p>
                 </div>
               ) : (
                 conversations.map((conversation) => {
                   const otherUserName = conversation.participantNames.find(name => name !== currentUser.fullName);
+                  const isSelected = selectedConversation === conversation.id;
+                  
                   return (
                     <div
                       key={conversation.id}
@@ -191,33 +211,35 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                         setSelectedConversation(conversation.id);
                         loadMessages(conversation.id);
                       }}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        selectedConversation === conversation.id 
-                          ? 'bg-primary/10 border-primary/20' 
-                          : 'hover:bg-muted/50'
+                      className={`p-4 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                        isSelected ? 'bg-gray-100 dark:bg-gray-800' : ''
                       }`}
                     >
-                      <div className="flex items-start space-x-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback>
-                            {otherUserName?.split(' ').map(n => n[0]).join('') || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
+                      <div className="flex items-center space-x-3">
+                        <div className="relative">
+                          <Avatar className="h-14 w-14">
+                            <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white">
+                              {otherUserName?.split(' ').map(n => n[0]).join('') || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                        </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium text-sm truncate">{otherUserName}</p>
-                            <span className="text-xs text-muted-foreground">
-                              {formatTime(conversation.lastMessageTime)}
-                            </span>
+                            <p className="font-medium text-gray-900 dark:text-white truncate">
+                              {otherUserName}
+                            </p>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs text-gray-500">
+                                {formatTime(conversation.lastMessageTime)}
+                              </span>
+                              {conversation.unreadCount > 0 && (
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-sm text-muted-foreground truncate">
+                          <p className="text-sm text-gray-500 truncate mt-1">
                             {conversation.lastMessage}
                           </p>
-                          {conversation.unreadCount > 0 && (
-                            <Badge variant="default" className="text-xs mt-1 h-5">
-                              {conversation.unreadCount}
-                            </Badge>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -228,69 +250,109 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
           </ScrollArea>
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 flex flex-col">
+        {/* Messages Area - Instagram Style */}
+        <div className="flex-1 flex flex-col bg-white dark:bg-gray-900">
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">
-                  {conversations.find(c => c.id === selectedConversation)?.participantNames.find(name => name !== currentUser.fullName)}
-                </CardTitle>
-              </CardHeader>
-
-              {/* Messages */}
-              <ScrollArea className="flex-1 px-4">
-                <div className="space-y-4 pb-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.senderId === currentUser.id ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.senderId === currentUser.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted'
-                      }`}>
-                        <p className="text-sm">{message.content}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.senderId === currentUser.id 
-                            ? 'text-primary-foreground/70' 
-                            : 'text-muted-foreground'
-                        }`}>
-                          {formatTime(message.timestamp)}
-                        </p>
-                      </div>
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white">
+                        {conversations.find(c => c.id === selectedConversation)?.participantNames.find(name => name !== currentUser.fullName)?.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {conversations.find(c => c.id === selectedConversation)?.participantNames.find(name => name !== currentUser.fullName)}
+                      </h3>
+                      <p className="text-xs text-gray-500">Active now</p>
                     </div>
-                  ))}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="ghost" size="sm" className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                      <Phone className="h-5 w-5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                      <Video className="h-5 w-5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                      <Info className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Messages - Instagram Style */}
+              <ScrollArea className="flex-1 px-6 py-4 bg-white dark:bg-gray-900">
+                <div className="space-y-4">
+                  {messages.map((message, index) => {
+                    const isFromMe = message.senderId === currentUser.id;
+                    const showTime = index === 0 || 
+                      new Date(message.timestamp).getTime() - new Date(messages[index - 1]?.timestamp).getTime() > 300000; // 5 minutes
+                    
+                    return (
+                      <div key={message.id}>
+                        {showTime && (
+                          <div className="text-center text-xs text-gray-500 mb-4">
+                            {formatMessageTime(message.timestamp)}
+                          </div>
+                        )}
+                        <div className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-xs lg:max-w-sm px-4 py-2 rounded-2xl ${
+                            isFromMe
+                              ? 'bg-blue-500 text-white ml-4'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mr-4'
+                          }`}>
+                            <p className="text-sm">{message.content}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </ScrollArea>
 
-              {/* Message Input */}
-              <div className="p-4 border-t">
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  />
-                  <Button onClick={sendMessage} disabled={!newMessage.trim()}>
-                    <Send className="h-4 w-4" />
-                  </Button>
+              {/* Message Input - Instagram Style */}
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-1 relative">
+                    <Input
+                      placeholder="Message..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      className="rounded-2xl border-gray-300 dark:border-gray-600 pl-4 pr-12 bg-gray-100 dark:bg-gray-800 border-none"
+                    />
+                    {newMessage.trim() && (
+                      <Button
+                        onClick={sendMessage}
+                        size="sm"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full h-6 w-6 p-1"
+                      >
+                        <Send className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
+            <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-900">
               <div className="text-center">
-                <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Select a conversation to start messaging</p>
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
+                  <MessageCircle className="h-12 w-12 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Your Messages</h3>
+                <p className="text-gray-500 max-w-sm mx-auto">
+                  Send private messages to friends or groups. Start a conversation now.
+                </p>
               </div>
             </div>
           )}
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
