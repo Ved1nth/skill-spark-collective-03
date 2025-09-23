@@ -49,111 +49,299 @@ const ActivityDetail = () => {
     );
   }
 
-  // Mock groups data for this activity
-  const groups = [
-    {
-      id: 1,
-      name: 'Morning Hikers Club',
-      description: 'Early morning hiking adventures for fitness enthusiasts',
-      members: 24,
-      rating: 4.8,
-      nextEvent: 'This Saturday 6:00 AM',
-      location: 'Blue Ridge Trail',
-      owner: {
-        name: 'Sarah Johnson',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
-        title: 'Hiking Instructor',
-        experience: '5 years'
-      },
-      isPrivate: false,
-      tags: ['Beginner Friendly', 'Fitness', 'Nature']
-    },
-    {
-      id: 2,
-      name: 'Adventure Seekers',
-      description: 'Challenging trails and overnight camping experiences',
-      members: 18,
-      rating: 4.9,
-      nextEvent: 'Next Weekend',
-      location: 'Mountain Peak Trail',
-      owner: {
-        name: 'Mike Chen',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-        title: 'Mountain Guide',
-        experience: '8 years'
-      },
-      isPrivate: false,
-      tags: ['Advanced', 'Camping', 'Challenge']
-    },
-    {
-      id: 3,
-      name: 'Nature Photography Hikers',
-      description: 'Combine hiking with landscape and wildlife photography',
-      members: 31,
-      rating: 4.7,
-      nextEvent: 'Sunday 7:00 AM',
-      location: 'Scenic Valley',
-      owner: {
-        name: 'Emma Wilson',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-        title: 'Professional Photographer',
-        experience: '6 years'
-      },
-      isPrivate: false,
-      tags: ['Photography', 'Creative', 'Scenic']
-    },
-    {
-      id: 4,
-      name: 'University Hiking Society',
-      description: 'Weekly hikes for university students and alumni',
-      members: 45,
-      rating: 4.6,
-      nextEvent: 'Friday 4:00 PM',
-      location: 'Campus Trail',
-      owner: {
-        name: 'Alex Rodriguez',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-        title: 'Student Leader',
-        experience: '3 years'
-      },
-      isPrivate: false,
-      tags: ['Students', 'Social', 'Weekly']
-    },
-    {
-      id: 5,
-      name: 'Weekend Warriors',
-      description: 'Intensive weekend hiking expeditions for experienced hikers',
-      members: 12,
-      rating: 5.0,
-      nextEvent: 'Next Saturday',
-      location: 'Rocky Ridge',
-      owner: {
-        name: 'David Kim',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
-        title: 'Expedition Leader',
-        experience: '10 years'
-      },
-      isPrivate: true,
-      tags: ['Expert', 'Intensive', 'Exclusive']
-    },
-    {
-      id: 6,
-      name: 'Family Friendly Trails',
-      description: 'Easy hiking trails perfect for families with children',
-      members: 38,
-      rating: 4.5,
-      nextEvent: 'This Sunday 10:00 AM',
-      location: 'Gentle Meadow Trail',
-      owner: {
-        name: 'Lisa Park',
-        avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=100&h=100&fit=crop&crop=face',
-        title: 'Family Coordinator',
-        experience: '4 years'
-      },
-      isPrivate: false,
-      tags: ['Family', 'Easy', 'Kids Welcome']
-    },
-  ];
+  // Mock groups data for this activity - different groups per activity type
+  const getGroupsForActivity = (activityId: string) => {
+    switch (activityId) {
+      case 'weekend-hiking':
+        return [
+          {
+            id: 1,
+            name: 'Morning Hikers Club',
+            description: 'Early morning hiking adventures for fitness enthusiasts',
+            members: 24,
+            rating: 4.8,
+            nextEvent: 'This Saturday 6:00 AM',
+            location: 'Blue Ridge Trail',
+            owner: {
+              name: 'Sarah Johnson',
+              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
+              title: 'Hiking Instructor',
+              experience: '5 years'
+            },
+            isPrivate: false,
+            tags: ['Beginner Friendly', 'Fitness', 'Nature']
+          },
+          {
+            id: 2,
+            name: 'Adventure Seekers',
+            description: 'Challenging trails and overnight camping experiences',
+            members: 18,
+            rating: 4.9,
+            nextEvent: 'Next Weekend',
+            location: 'Mountain Peak Trail',
+            owner: {
+              name: 'Mike Chen',
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+              title: 'Mountain Guide',
+              experience: '8 years'
+            },
+            isPrivate: false,
+            tags: ['Advanced', 'Camping', 'Challenge']
+          },
+          {
+            id: 3,
+            name: 'Nature Photography Hikers',
+            description: 'Combine hiking with landscape and wildlife photography',
+            members: 31,
+            rating: 4.7,
+            nextEvent: 'Sunday 7:00 AM',
+            location: 'Scenic Valley',
+            owner: {
+              name: 'Emma Wilson',
+              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+              title: 'Professional Photographer',
+              experience: '6 years'
+            },
+            isPrivate: false,
+            tags: ['Photography', 'Creative', 'Scenic']
+          },
+          {
+            id: 4,
+            name: 'Family Friendly Trails',
+            description: 'Easy hiking trails perfect for families with children',
+            members: 38,
+            rating: 4.5,
+            nextEvent: 'This Sunday 10:00 AM',
+            location: 'Gentle Meadow Trail',
+            owner: {
+              name: 'Lisa Park',
+              avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=100&h=100&fit=crop&crop=face',
+              title: 'Family Coordinator',
+              experience: '4 years'
+            },
+            isPrivate: false,
+            tags: ['Family', 'Easy', 'Kids Welcome']
+          }
+        ];
+
+      case 'tech-meetup':
+        return [
+          {
+            id: 1,
+            name: 'React Developers Circle',
+            description: 'Weekly discussions about React, hooks, and modern frontend development',
+            members: 42,
+            rating: 4.9,
+            nextEvent: 'Thursday 7:00 PM',
+            location: 'Tech Hub Conference Room A',
+            owner: {
+              name: 'Alex Rodriguez',
+              avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+              title: 'Senior Frontend Developer',
+              experience: '6 years'
+            },
+            isPrivate: false,
+            tags: ['React', 'Frontend', 'JavaScript']
+          },
+          {
+            id: 2,
+            name: 'AI & Machine Learning Group',
+            description: 'Exploring artificial intelligence, ML algorithms, and data science',
+            members: 35,
+            rating: 4.8,
+            nextEvent: 'Friday 6:30 PM',
+            location: 'University Lab 201',
+            owner: {
+              name: 'Dr. Priya Sharma',
+              avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face',
+              title: 'Data Science Professor',
+              experience: '8 years'
+            },
+            isPrivate: false,
+            tags: ['AI', 'Machine Learning', 'Python']
+          },
+          {
+            id: 3,
+            name: 'Startup Founders Network',
+            description: 'Connect with fellow entrepreneurs and discuss startup strategies',
+            members: 28,
+            rating: 4.7,
+            nextEvent: 'Wednesday 8:00 PM',
+            location: 'Innovation Center',
+            owner: {
+              name: 'Jordan Kim',
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+              title: 'Serial Entrepreneur',
+              experience: '10 years'
+            },
+            isPrivate: true,
+            tags: ['Entrepreneurship', 'Startups', 'Business']
+          },
+          {
+            id: 4,
+            name: 'Mobile Development Squad',
+            description: 'iOS, Android, and cross-platform mobile app development',
+            members: 31,
+            rating: 4.6,
+            nextEvent: 'Saturday 2:00 PM',
+            location: 'Tech Cafe',
+            owner: {
+              name: 'Maria Santos',
+              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
+              title: 'Mobile Tech Lead',
+              experience: '7 years'
+            },
+            isPrivate: false,
+            tags: ['iOS', 'Android', 'Flutter']
+          },
+          {
+            id: 5,
+            name: 'DevOps & Cloud Engineers',
+            description: 'Infrastructure, deployment, and cloud computing discussions',
+            members: 22,
+            rating: 4.8,
+            nextEvent: 'Tuesday 7:30 PM',
+            location: 'Online (Zoom)',
+            owner: {
+              name: 'Chris Thompson',
+              avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+              title: 'DevOps Architect',
+              experience: '9 years'
+            },
+            isPrivate: false,
+            tags: ['DevOps', 'AWS', 'Docker']
+          },
+          {
+            id: 6,
+            name: 'Cybersecurity Experts',
+            description: 'Security best practices, ethical hacking, and threat analysis',
+            members: 19,
+            rating: 4.9,
+            nextEvent: 'Monday 8:00 PM',
+            location: 'Security Lab',
+            owner: {
+              name: 'Rachel Green',
+              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+              title: 'Security Consultant',
+              experience: '5 years'
+            },
+            isPrivate: true,
+            tags: ['Security', 'Ethical Hacking', 'Privacy']
+          }
+        ];
+
+      case 'study-groups':
+        return [
+          {
+            id: 1,
+            name: 'Calculus Study Circle',
+            description: 'Advanced calculus problem solving and exam preparation',
+            members: 26,
+            rating: 4.7,
+            nextEvent: 'Tomorrow 3:00 PM',
+            location: 'Library Study Room 3',
+            owner: {
+              name: 'David Park',
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+              title: 'Mathematics Tutor',
+              experience: '4 years'
+            },
+            isPrivate: false,
+            tags: ['Mathematics', 'Calculus', 'Exam Prep']
+          },
+          {
+            id: 2,
+            name: 'Organic Chemistry Lab',
+            description: 'Collaborative learning for organic chemistry concepts and lab work',
+            members: 18,
+            rating: 4.8,
+            nextEvent: 'Wednesday 5:00 PM',
+            location: 'Chemistry Building 205',
+            owner: {
+              name: 'Sophie Chen',
+              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
+              title: 'Chemistry Graduate Student',
+              experience: '3 years'
+            },
+            isPrivate: false,
+            tags: ['Chemistry', 'Lab Work', 'STEM']
+          },
+          {
+            id: 3,
+            name: 'Business Finance Group',
+            description: 'Financial analysis, accounting principles, and business cases',
+            members: 34,
+            rating: 4.6,
+            nextEvent: 'Thursday 4:00 PM',
+            location: 'Business School 101',
+            owner: {
+              name: 'Michael Johnson',
+              avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+              title: 'Finance Professor',
+              experience: '7 years'
+            },
+            isPrivate: false,
+            tags: ['Finance', 'Business', 'Accounting']
+          },
+          {
+            id: 4,
+            name: 'Psychology Research Team',
+            description: 'Research methods, statistical analysis, and psychology theories',
+            members: 22,
+            rating: 4.9,
+            nextEvent: 'Friday 2:00 PM',
+            location: 'Psychology Lab',
+            owner: {
+              name: 'Dr. Amanda Wilson',
+              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+              title: 'Psychology Researcher',
+              experience: '6 years'
+            },
+            isPrivate: false,
+            tags: ['Psychology', 'Research', 'Statistics']
+          },
+          {
+            id: 5,
+            name: 'Language Exchange Circle',
+            description: 'Practice Spanish, French, German, and other languages',
+            members: 41,
+            rating: 4.5,
+            nextEvent: 'Daily 6:00 PM',
+            location: 'International Center',
+            owner: {
+              name: 'Elena Rodriguez',
+              avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=100&h=100&fit=crop&crop=face',
+              title: 'Linguistics Student',
+              experience: '2 years'
+            },
+            isPrivate: false,
+            tags: ['Languages', 'Cultural Exchange', 'Speaking']
+          },
+          {
+            id: 6,
+            name: 'Pre-Med Study Alliance',
+            description: 'MCAT preparation, medical school applications, and science review',
+            members: 29,
+            rating: 4.8,
+            nextEvent: 'Saturday 9:00 AM',
+            location: 'Pre-Med Center',
+            owner: {
+              name: 'James Liu',
+              avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+              title: 'Pre-Med Advisor',
+              experience: '5 years'
+            },
+            isPrivate: true,
+            tags: ['Pre-Med', 'MCAT', 'Medical School']
+          }
+        ];
+
+      default:
+        return [];
+    }
+  };
+
+  const groups = getGroupsForActivity(activityId!);
 
   const handleJoinGroup = (group: typeof groups[0]) => {
     if (!isSignedIn) {
