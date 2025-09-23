@@ -15,22 +15,29 @@ const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
+    console.log('App component mounted');
     // Check if user is signed in (this would connect to your auth system later)
     const checkAuthStatus = () => {
       // For now, we'll always show splash for new users
       // Later this would check localStorage, cookies, or auth tokens
       const hasSeenApp = localStorage.getItem('hasSeenApp');
+      console.log('hasSeenApp:', hasSeenApp);
       if (hasSeenApp) {
         setShowSplash(false);
+        console.log('Skipping splash screen');
       }
     };
 
     checkAuthStatus();
   }, []);
 
+  console.log('App render - showSplash:', showSplash);
+
   const handleEnterApp = () => {
+    console.log('handleEnterApp called');
     localStorage.setItem('hasSeenApp', 'true');
     setShowSplash(false);
+    console.log('showSplash set to false');
   };
 
   if (showSplash) {
