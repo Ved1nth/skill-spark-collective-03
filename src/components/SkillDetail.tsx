@@ -18,6 +18,30 @@ const SkillDetail = () => {
       totalMembers: 124,
       color: 'bg-blue-100 text-blue-600',
     },
+    'graphic-design': {
+      name: 'Graphic Design',
+      description: 'Design visual content and brand identities',
+      totalMembers: 103,
+      color: 'bg-orange-100 text-orange-600',
+    },
+    'writing-services': {
+      name: 'Writing & Assignments',
+      description: 'Academic writing, essays, research papers and assignments',
+      totalMembers: 156,
+      color: 'bg-green-100 text-green-600',
+    },
+    'video-editing': {
+      name: 'Video Editing',
+      description: 'Professional video editing and post-production services',
+      totalMembers: 78,
+      color: 'bg-red-100 text-red-600',
+    },
+    'digital-marketing': {
+      name: 'Digital Marketing',
+      description: 'Social media marketing, SEO, and online advertising',
+      totalMembers: 92,
+      color: 'bg-pink-100 text-pink-600',
+    },
     'photography': {
       name: 'Photography',
       description: 'Capture moments and create visual stories',
@@ -28,13 +52,13 @@ const SkillDetail = () => {
       name: 'Music Production',
       description: 'Create and produce music across all genres',
       totalMembers: 67,
-      color: 'bg-green-100 text-green-600',
+      color: 'bg-indigo-100 text-indigo-600',
     },
-    'graphic-design': {
-      name: 'Graphic Design',
-      description: 'Design visual content and brand identities',
-      totalMembers: 103,
-      color: 'bg-orange-100 text-orange-600',
+    'voice-over': {
+      name: 'Voice Over',
+      description: 'Professional voice acting and narration services',
+      totalMembers: 45,
+      color: 'bg-yellow-100 text-yellow-600',
     },
   };
 
