@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import SplashScreen from "./components/SplashScreen";
 import Home from "./components/Home";
 import SkillDetail from "./components/SkillDetail";
+import ActivityDetail from "./components/ActivityDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/skill/:skillId" element={<SkillDetail />} />
+            <Route path="/activity/:activityId" element={<ActivityDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

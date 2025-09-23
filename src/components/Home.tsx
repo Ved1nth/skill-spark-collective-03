@@ -16,6 +16,7 @@ const Home = () => {
 
   const activities = [
     {
+      id: 'weekend-hiking',
       title: 'Weekend Hiking',
       description: 'Explore nature trails with fellow outdoor enthusiasts',
       participants: 23,
@@ -23,6 +24,7 @@ const Home = () => {
       image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=300&fit=crop'
     },
     {
+      id: 'tech-meetup',
       title: 'Tech Meetup',
       description: 'Weekly discussions about latest in technology',
       participants: 45,
@@ -30,6 +32,7 @@ const Home = () => {
       image: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=300&fit=crop'
     },
     {
+      id: 'study-groups',
       title: 'Study Groups',
       description: 'Collaborative learning sessions across subjects',
       participants: 78,
@@ -75,10 +78,9 @@ const Home = () => {
     navigate(`/skill/${skillId}`);
   };
 
-  const handleActivityClick = (activityTitle: string) => {
-    console.log('Activity clicked:', activityTitle);
-    // Later this would navigate to activity detail page
-    alert(`${activityTitle} details coming soon! For now, browse freely.`);
+  const handleActivityClick = (activityId: string) => {
+    console.log('Activity clicked:', activityId);
+    navigate(`/activity/${activityId}`);
   };
 
   const handleStartConnecting = () => {
@@ -200,7 +202,7 @@ const Home = () => {
       <section id="activities-section" className="py-12 px-4">
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-3xl font-bold">Active Communities</h3>
+            <h3 className="text-3xl font-bold">Activity and Events</h3>
             <Button variant="ghost" className="text-primary hover:bg-primary/10">
               Explore All →
             </Button>
@@ -209,9 +211,9 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activities.map((activity, index) => (
               <Card 
-                key={activity.title}
+                key={activity.id}
                 className="group hover:shadow-lg transition-smooth cursor-pointer overflow-hidden border-border/50 hover:border-primary/20"
-                onClick={() => handleActivityClick(activity.title)}
+                onClick={() => handleActivityClick(activity.id)}
               >
                 <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 relative overflow-hidden">
                   <img 
