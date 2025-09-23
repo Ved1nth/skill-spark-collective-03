@@ -1,16 +1,20 @@
-import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, Moon, Sun } from 'lucide-react';
+import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, Moon, Sun, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import SignInModal from './SignInModal';
+import MessagesModal from './MessagesModal';
 
 const Home = () => {
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   
   const skills = [
     { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
@@ -143,6 +147,24 @@ const Home = () => {
     }
   }, []);
 
+  // Update unread message count
+  useEffect(() => {
+    if (user) {
+      const updateUnreadCount = () => {
+        const allMessages = JSON.parse(localStorage.getItem('gta_messages') || '[]');
+        const unread = allMessages.filter((message: any) => 
+          message.receiverId === user.id && !message.read
+        ).length;
+        setUnreadCount(unread);
+      };
+
+      updateUnreadCount();
+      // Check for new messages every 5 seconds
+      const interval = setInterval(updateUnreadCount, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
   return (
     <div className="min-h-screen bg-gradient-soft">
       {/* Header */}
@@ -184,6 +206,23 @@ const Home = () => {
               
               {user ? (
                 <div className="flex items-center space-x-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowMessagesModal(true)}
+                    className="text-muted-foreground hover:text-primary relative"
+                    aria-label="Messages"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    {unreadCount > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center"
+                      >
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </Badge>
+                    )}
+                  </Button>
                   <div className="text-sm">
                     <span className="text-muted-foreground">Welcome, </span>
                     <span className="font-medium">{user.fullName.split(' ')[0]}</span>
@@ -427,6 +466,13 @@ const Home = () => {
         isOpen={showSignInModal}
         onClose={() => setShowSignInModal(false)}
         onSignIn={handleUserSignIn}
+      />
+
+      {/* Messages Modal */}
+      <MessagesModal 
+        isOpen={showMessagesModal}
+        onClose={() => setShowMessagesModal(false)}
+        currentUser={user}
       />
     </div>
   );

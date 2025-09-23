@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 const SkillDetail = () => {
   const { skillId } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Mock data - in a real app this would come from an API
   const skillData = {
@@ -418,12 +420,72 @@ const SkillDetail = () => {
 
   const communities = getCommunitiesForSkill(skillId!);
 
-  const handleContactPerson = (personName: string) => {
-    alert(`Contact feature coming soon! For now, you can browse ${personName}'s profile freely.`);
+  const handleContactPerson = (person: typeof people[0], contactType: 'message' | 'email') => {
+    const currentUser = JSON.parse(localStorage.getItem('gta_user') || 'null');
+    
+    if (!currentUser) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to contact other students.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (contactType === 'message') {
+      // Create a new message conversation
+      const conversationId = [currentUser.id, person.id.toString()].sort().join('-');
+      const allMessages = JSON.parse(localStorage.getItem('gta_messages') || '[]');
+      
+      // Check if conversation already exists
+      const existingMessage = allMessages.find((msg: any) => msg.conversationId === conversationId);
+      
+      if (!existingMessage) {
+        // Create initial system message
+        const initialMessage = {
+          id: Date.now().toString(),
+          conversationId,
+          senderId: 'system',
+          senderName: 'System',
+          receiverId: currentUser.id,
+          receiverName: currentUser.fullName,
+          content: `You can now message ${person.name}. Start a conversation!`,
+          timestamp: new Date().toISOString(),
+          read: false
+        };
+        
+        allMessages.push(initialMessage);
+        localStorage.setItem('gta_messages', JSON.stringify(allMessages));
+      }
+
+      toast({
+        title: "Conversation started!",
+        description: `You can now message ${person.name}. Check your messages.`,
+      });
+    } else {
+      toast({
+        title: "Email feature",
+        description: `Would open email client to contact ${person.name} at their RNSIT email.`,
+      });
+    }
   };
 
   const handleJoinCommunity = (communityTitle: string) => {
-    alert(`Join feature coming soon! Sign up to participate in ${communityTitle}.`);
+    const currentUser = JSON.parse(localStorage.getItem('gta_user') || 'null');
+    
+    if (!currentUser) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to join communities.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Joined community!",
+      description: `You've successfully joined ${communityTitle}.`,
+    });
   };
 
   return (
@@ -492,24 +554,24 @@ const SkillDetail = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="flex space-x-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleContactPerson(person.name)}
-                      >
-                        <MessageCircle className="h-4 w-4 mr-2" />
-                        Message
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleContactPerson(person.name)}
-                      >
-                        <Mail className="h-4 w-4 mr-2" />
-                        Email
-                      </Button>
-                    </div>
+                  <div className="flex space-x-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleContactPerson(person, 'message')}
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Message
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleContactPerson(person, 'email')}
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Email
+                    </Button>
+                  </div>
                   </CardContent>
                 </Card>
               ))}
