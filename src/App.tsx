@@ -16,19 +16,9 @@ const App = () => {
 
   useEffect(() => {
     console.log('App component mounted');
-    // Check if user is signed in (this would connect to your auth system later)
-    const checkAuthStatus = () => {
-      // For now, we'll always show splash for new users
-      // Later this would check localStorage, cookies, or auth tokens
-      const hasSeenApp = localStorage.getItem('hasSeenApp');
-      console.log('hasSeenApp:', hasSeenApp);
-      if (hasSeenApp) {
-        setShowSplash(false);
-        console.log('Skipping splash screen');
-      }
-    };
-
-    checkAuthStatus();
+    // Always show splash screen on first load for the intro animation
+    // In a real app, you might want to show this only once per session
+    setShowSplash(true);
   }, []);
 
   console.log('App render - showSplash:', showSplash);

@@ -44,7 +44,7 @@ const Home = () => {
             <div className="flex items-center space-x-2">
               <Zap className="h-8 w-8 text-primary electric-pulse" />
               <h1 className="text-2xl font-bold">
-                Spark<span className="text-primary">Connect</span>
+                <span className="text-primary">GTA</span>
               </h1>
             </div>
             

@@ -8,41 +8,56 @@ interface SplashScreenProps {
 
 const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
   const [showBolt, setShowBolt] = useState(false);
-  const [showButton, setShowButton] = useState(false);
+  const [showAppName, setShowAppName] = useState(false);
+  const [showGoToApp, setShowGoToApp] = useState(false);
+  const [animateOut, setAnimateOut] = useState(false);
 
   useEffect(() => {
-    console.log('SplashScreen mounted');
-    // Show electric bolt after brief delay
+    console.log('SplashScreen mounted - starting 2s animation sequence');
+    
+    // Stage 1: Show electric bolt (0.2s delay)
     const boltTimer = setTimeout(() => {
       setShowBolt(true);
-      console.log('Bolt shown');
-    }, 500);
+    }, 200);
 
-    // Show "Go to App" button after bolt animation
-    const buttonTimer = setTimeout(() => {
-      setShowButton(true);
-      console.log('Button shown');
-    }, 2500);
+    // Stage 2: Show GTA app name (0.8s)
+    const appNameTimer = setTimeout(() => {
+      setShowAppName(true);
+    }, 800);
+
+    // Stage 3: Show "Go to App" text (1.4s)
+    const goToAppTimer = setTimeout(() => {
+      setShowGoToApp(true);
+    }, 1400);
+
+    // Stage 4: Start animate out (1.8s)
+    const animateOutTimer = setTimeout(() => {
+      setAnimateOut(true);
+    }, 1800);
+
+    // Stage 5: Complete transition to main app (2.2s)
+    const completeTimer = setTimeout(() => {
+      console.log('Animation sequence complete - transitioning to main app');
+      onEnterApp();
+    }, 2200);
 
     return () => {
       clearTimeout(boltTimer);
-      clearTimeout(buttonTimer);
+      clearTimeout(appNameTimer);
+      clearTimeout(goToAppTimer);
+      clearTimeout(animateOutTimer);
+      clearTimeout(completeTimer);
     };
-  }, []);
-
-  const handleButtonClick = () => {
-    console.log('Go to App button clicked');
-    onEnterApp();
-  };
+  }, [onEnterApp]);
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center relative overflow-hidden">
+    <div className={`min-h-screen bg-black flex flex-col items-center justify-center relative overflow-hidden transition-all duration-500 ${animateOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
       {/* Background electric effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-primary/5 to-black" />
       
       {/* Electric bolt animation */}
       {showBolt && (
-        <div className="relative z-10 fade-in-up">
+        <div className={`relative z-10 transition-all duration-300 ${showBolt ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}>
           <img 
             src={electricBolt} 
             alt="Electric Bolt" 
@@ -59,28 +74,25 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
         </div>
       )}
 
-      {/* App title - appears with bolt */}
-      {showBolt && (
-        <div className="mt-8 text-center fade-in-up">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Spark<span className="text-primary">Connect</span>
+      {/* GTA App Name */}
+      {showAppName && (
+        <div className={`mt-8 text-center transition-all duration-500 ${showAppName ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <h1 className="text-6xl font-bold text-white mb-2 tracking-wider">
+            <span className="text-primary electric-pulse">GTA</span>
           </h1>
           <p className="text-gray-400 text-lg">
-            Where skills meet opportunity
+            Go To App
           </p>
         </div>
       )}
 
-      {/* Go to App button */}
-      {showButton && (
-        <div className="mt-12 fade-in-up">
-          <Button
-            onClick={handleButtonClick}
-            size="lg"
-            className="px-8 py-4 text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-2xl hover:shadow-primary/25 transform hover:scale-105 transition-all duration-300"
-          >
+      {/* Go to App Text */}
+      {showGoToApp && (
+        <div className={`mt-8 text-center transition-all duration-500 ${showGoToApp ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <p className="text-2xl text-white font-semibold tracking-wide">
             Go to App
-          </Button>
+          </p>
+          <div className="w-24 h-1 bg-gradient-electric mx-auto mt-2 rounded-full" />
         </div>
       )}
 
