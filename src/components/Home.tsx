@@ -1,11 +1,13 @@
-import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp } from 'lucide-react';
+import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const Home = () => {
   const navigate = useNavigate();
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   const skills = [
     { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
@@ -102,6 +104,24 @@ const Home = () => {
     alert('Ready to connect? Sign up to start messaging talented students and joining activities!');
   };
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  // Apply theme on component mount and when isDarkMode changes
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
   return (
     <div className="min-h-screen bg-gradient-soft">
       {/* Header */}
@@ -127,6 +147,19 @@ const Home = () => {
             </div>
 
             <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="text-muted-foreground hover:text-primary"
+                aria-label="Toggle theme"
+              >
+                {isDarkMode ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
               <Button 
                 variant="ghost" 
                 className="text-muted-foreground hover:text-primary"
