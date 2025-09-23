@@ -8,35 +8,50 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Clean, modern color palette inspired by Apple/Notion */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 220 9% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 9% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 9% 9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Electric blue primary - the spark that connects */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 217 91% 95%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Subtle grays for secondary content */
+    --secondary: 220 13% 96%;
+    --secondary-foreground: 220 9% 46%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 13% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 217 91% 95%;
+    --accent-foreground: 217 91% 60%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
 
-    --radius: 0.5rem;
+    /* Electric gradients for special effects */
+    --gradient-electric: linear-gradient(135deg, hsl(217 91% 60%), hsl(230 91% 70%));
+    --gradient-soft: linear-gradient(180deg, hsl(220 13% 98%), hsl(220 13% 96%));
+    
+    /* Elegant shadows */
+    --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-electric: 0 4px 20px -4px hsl(217 91% 60% / 0.3);
+    
+    /* Smooth transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +115,73 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  /* Electric Animations */
+  .electric-pulse {
+    animation: electricPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .electric-glow {
+    box-shadow: var(--shadow-electric);
+  }
+  
+  /* Utility Classes */
+  .gradient-electric {
+    background: var(--gradient-electric);
+  }
+  
+  .gradient-soft {
+    background: var(--gradient-soft);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
+
+@layer utilities {
+  @keyframes electricPulse {
+    0%, 100% { 
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% { 
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+  
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+  
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  
+  .animation-delay-700 {
+    animation-delay: 700ms;
   }
 }
