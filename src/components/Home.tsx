@@ -169,18 +169,18 @@ const Home = () => {
     <div className="min-h-screen bg-gradient-soft">
       {/* Header */}
       <header className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Zap className="h-8 w-8 text-primary electric-pulse" />
-              <h1 className="text-2xl font-bold">
+              <Zap className="h-6 w-6 md:h-8 md:w-8 text-primary electric-pulse" />
+              <h1 className="text-xl md:text-2xl font-bold">
                 <span className="text-primary">GTA</span>
               </h1>
             </div>
             
-            {/* Search Bar */}
-            <div className="flex-1 max-w-md mx-8">
-              <div className="relative">
+            {/* Search Bar - Hidden on mobile, visible on desktop */}
+            <div className="hidden md:flex flex-1 max-w-md mx-8">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input 
                   placeholder="Search skills, activities, or people..." 
@@ -189,12 +189,12 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1 md:space-x-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="text-muted-foreground hover:text-primary"
+                className="text-muted-foreground hover:text-primary p-2"
                 aria-label="Toggle theme"
               >
                 {isDarkMode ? (
@@ -205,83 +205,100 @@ const Home = () => {
               </Button>
               
               {user ? (
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1 md:space-x-3">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowMessagesModal(true)}
-                    className="text-muted-foreground hover:text-primary relative"
+                    className="text-muted-foreground hover:text-primary relative p-2"
                     aria-label="Messages"
                   >
                     <MessageCircle className="h-4 w-4" />
                     {unreadCount > 0 && (
                       <Badge 
                         variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center"
+                        className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs flex items-center justify-center"
                       >
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </Badge>
                     )}
                   </Button>
-                  <div className="text-sm">
+                  <div className="hidden md:block text-sm">
                     <span className="text-muted-foreground">Welcome, </span>
                     <span className="font-medium">{user.fullName.split(' ')[0]}</span>
                   </div>
                   <Button 
                     variant="ghost" 
+                    size="sm"
                     className="text-muted-foreground hover:text-primary"
                     onClick={handleSignOut}
                   >
-                    Sign Out
+                    <span className="hidden md:inline">Sign Out</span>
+                    <span className="md:hidden">Out</span>
                   </Button>
                 </div>
               ) : (
                 <>
                   <Button 
                     variant="ghost" 
+                    size="sm"
                     className="text-muted-foreground hover:text-primary"
                     onClick={handleSignIn}
                   >
-                    Sign In
+                    <span className="hidden md:inline">Sign In</span>
+                    <span className="md:hidden">In</span>
                   </Button>
                   <Button 
+                    size="sm"
                     className="gradient-electric text-primary-foreground hover:opacity-90 electric-glow"
                     onClick={handleGetStarted}
                   >
-                    Get Started
+                    <span className="hidden md:inline">Get Started</span>
+                    <span className="md:hidden">Start</span>
                   </Button>
                 </>
               )}
+            </div>
+          </div>
+          
+          {/* Mobile Search Bar */}
+          <div className="md:hidden mt-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input 
+                placeholder="Search skills, activities, or people..." 
+                className="pl-10 border-border/50 focus:ring-primary/20"
+              />
             </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 px-4 relative overflow-hidden">
-        {/* Animated Background Graphics */}
+      <section className="py-8 md:py-16 px-4 relative overflow-hidden">
+        {/* Animated Background Graphics - Simplified for mobile */}
         <div className="absolute inset-0 pointer-events-none">
-          {/* Floating Skill Icons */}
-          <div className="absolute top-20 left-10 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center animate-float-slow">
+          {/* Floating Skill Icons - Fewer on mobile */}
+          <div className="hidden md:block absolute top-20 left-10 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center animate-float-slow">
             <Code className="h-6 w-6 text-primary/60" />
           </div>
-          <div className="absolute top-32 right-20 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center animate-float-delayed">
-            <Camera className="h-5 w-5 text-purple-500" />
+          <div className="absolute top-16 md:top-32 right-4 md:right-20 w-8 md:w-10 h-8 md:h-10 rounded-full bg-purple-100 flex items-center justify-center animate-float-delayed">
+            <Camera className="h-4 md:h-5 w-4 md:w-5 text-purple-500" />
           </div>
-          <div className="absolute bottom-32 left-20 w-14 h-14 rounded-full bg-green-100 flex items-center justify-center animate-float-reverse">
+          <div className="hidden md:block absolute bottom-32 left-20 w-14 h-14 rounded-full bg-green-100 flex items-center justify-center animate-float-reverse">
             <PenTool className="h-7 w-7 text-green-500" />
           </div>
-          <div className="absolute top-40 right-40 w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center animate-float-slow">
-            <Palette className="h-4 w-4 text-orange-500" />
+          <div className="absolute top-24 md:top-40 right-8 md:right-40 w-6 md:w-8 h-6 md:h-8 rounded-full bg-orange-100 flex items-center justify-center animate-float-slow">
+            <Palette className="h-3 md:h-4 w-3 md:w-4 text-orange-500" />
           </div>
-          <div className="absolute bottom-40 right-16 w-11 h-11 rounded-full bg-blue-100 flex items-center justify-center animate-float-delayed">
-            <Video className="h-5 w-5 text-blue-500" />
+          <div className="absolute bottom-20 md:bottom-40 right-6 md:right-16 w-9 md:w-11 h-9 md:h-11 rounded-full bg-blue-100 flex items-center justify-center animate-float-delayed">
+            <Video className="h-4 md:h-5 w-4 md:w-5 text-blue-500" />
           </div>
-          <div className="absolute top-60 left-32 w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center animate-float-reverse">
+          <div className="hidden md:block absolute top-60 left-32 w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center animate-float-reverse">
             <Mic className="h-4 w-4 text-yellow-500" />
           </div>
 
-          {/* Connection Lines */}
+          {/* Connection Lines - Simplified for mobile */}
           <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -290,55 +307,45 @@ const Home = () => {
               </linearGradient>
             </defs>
             
-            {/* Animated connection lines */}
+            {/* Animated connection lines - Hidden on mobile for performance */}
             <path
               d="M100,80 Q200,120 300,100 T500,90"
               stroke="url(#connectionGradient)"
               strokeWidth="2"
               fill="none"
-              className="animate-draw-line"
+              className="hidden md:block animate-draw-line"
             />
             <path
               d="M150,200 Q250,160 400,180 T600,170"
               stroke="url(#connectionGradient)"
               strokeWidth="1.5"
               fill="none"
-              className="animate-draw-line-delayed"
-            />
-            <path
-              d="M80,300 Q180,260 280,280 T480,270"
-              stroke="url(#connectionGradient)"
-              strokeWidth="1"
-              fill="none"
-              className="animate-draw-line-reverse"
+              className="hidden md:block animate-draw-line-delayed"
             />
           </svg>
 
-          {/* Floating Particles */}
-          <div className="absolute top-24 left-1/4 w-2 h-2 bg-primary/40 rounded-full animate-pulse-float"></div>
-          <div className="absolute bottom-32 right-1/3 w-1.5 h-1.5 bg-purple-400/50 rounded-full animate-pulse-float-delayed"></div>
-          <div className="absolute top-48 right-1/4 w-3 h-3 bg-green-400/30 rounded-full animate-pulse-float-reverse"></div>
-          <div className="absolute bottom-48 left-1/3 w-2.5 h-2.5 bg-orange-400/40 rounded-full animate-pulse-float"></div>
-          <div className="absolute top-36 left-2/3 w-1 h-1 bg-blue-400/60 rounded-full animate-pulse-float-delayed"></div>
+          {/* Floating Particles - Reduced for mobile */}
+          <div className="hidden md:block absolute top-24 left-1/4 w-2 h-2 bg-primary/40 rounded-full animate-pulse-float"></div>
+          <div className="absolute bottom-16 md:bottom-32 right-1/4 md:right-1/3 w-1.5 h-1.5 bg-purple-400/50 rounded-full animate-pulse-float-delayed"></div>
+          <div className="hidden md:block absolute top-48 right-1/4 w-3 h-3 bg-green-400/30 rounded-full animate-pulse-float-reverse"></div>
 
-          {/* Gradient Orbs */}
-          <div className="absolute top-16 right-12 w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full blur-xl animate-blob"></div>
-          <div className="absolute bottom-20 left-16 w-40 h-40 bg-gradient-to-br from-purple-400/15 to-pink-400/10 rounded-full blur-2xl animate-blob-delayed"></div>
-          <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-gradient-to-br from-green-400/20 to-blue-400/10 rounded-full blur-xl animate-blob-reverse"></div>
+          {/* Gradient Orbs - Smaller on mobile */}
+          <div className="absolute top-8 md:top-16 right-4 md:right-12 w-16 md:w-32 h-16 md:h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full blur-xl animate-blob"></div>
+          <div className="absolute bottom-8 md:bottom-20 left-4 md:left-16 w-20 md:w-40 h-20 md:h-40 bg-gradient-to-br from-purple-400/15 to-pink-400/10 rounded-full blur-2xl animate-blob-delayed"></div>
         </div>
 
         <div className="container mx-auto text-center relative z-10">
-          <h2 className="text-5xl font-bold mb-6 gradient-electric bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 gradient-electric bg-clip-text text-transparent">
             Connect Through Skills
           </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground mb-6 md:mb-8 max-w-2xl mx-auto px-4">
             Discover talented students, join exciting activities, and build meaningful connections 
             based on shared interests and complementary skills.
           </p>
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 px-4">
             <Button 
               size="lg" 
-              className="gradient-electric text-primary-foreground electric-glow"
+              className="gradient-electric text-primary-foreground electric-glow w-full sm:w-auto"
               onClick={handleFindTalent}
             >
               <Users className="mr-2 h-5 w-5" />
@@ -347,7 +354,7 @@ const Home = () => {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-primary/20 hover:bg-primary/5"
+              className="border-primary/20 hover:bg-primary/5 w-full sm:w-auto"
               onClick={handleBrowseActivities}
             >
               <Calendar className="mr-2 h-5 w-5" />
@@ -358,34 +365,36 @@ const Home = () => {
       </section>
 
       {/* Skills Section */}
-      <section id="skills-section" className="py-12 px-4 bg-background/50">
+      <section id="skills-section" className="py-8 md:py-12 px-4 bg-background/50">
         <div className="container mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-3xl font-bold">Skills and Service</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 space-y-2 sm:space-y-0">
+            <h3 className="text-2xl md:text-3xl font-bold">Skills and Service</h3>
             <Button 
               variant="ghost" 
-              className="text-primary hover:bg-primary/10"
+              size="sm"
+              className="text-primary hover:bg-primary/10 self-start sm:self-auto"
               onClick={handleViewAllSkills}
             >
-              View All Skills →
+              <span className="hidden sm:inline">View All Skills →</span>
+              <span className="sm:hidden">View All →</span>
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {skills.map((skill, index) => {
               const IconComponent = skill.icon;
               return (
                 <Card 
                   key={skill.id} 
-                  className="group hover:shadow-lg transition-smooth cursor-pointer border-border/50 hover:border-primary/20"
+                  className="group hover:shadow-lg transition-smooth cursor-pointer border-border/50 hover:border-primary/20 active:scale-95"
                   onClick={() => handleSkillClick(skill.id)}
                 >
-                  <CardHeader className="pb-3">
-                    <div className={`w-12 h-12 rounded-lg ${skill.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-smooth`}>
-                      <IconComponent className="h-6 w-6" />
+                  <CardHeader className="pb-3 p-4 md:p-6">
+                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg ${skill.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-smooth`}>
+                      <IconComponent className="h-5 w-5 md:h-6 md:w-6" />
                     </div>
-                    <CardTitle className="text-lg">{skill.name}</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-base md:text-lg">{skill.name}</CardTitle>
+                    <CardDescription className="text-sm">
                       {skill.count} talented students
                     </CardDescription>
                   </CardHeader>

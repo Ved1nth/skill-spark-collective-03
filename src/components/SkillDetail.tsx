@@ -492,17 +492,24 @@ const SkillDetail = () => {
     <div className="min-h-screen bg-gradient-soft">
       {/* Header */}
       <header className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/')}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-            <div>
+        <div className="container mx-auto px-4 py-3 md:py-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between space-y-3 md:space-y-0">
+            <div className="flex items-center space-x-3 md:space-x-4">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="p-2"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="text-sm md:text-base">Back to Home</span>
+              </Button>
+            </div>
+            <div className="md:hidden">
+              <h1 className="text-xl font-bold">{skill.name}</h1>
+              <p className="text-sm text-muted-foreground">{skill.description}</p>
+            </div>
+            <div className="hidden md:block">
               <h1 className="text-2xl font-bold">{skill.name}</h1>
               <p className="text-muted-foreground">{skill.description}</p>
             </div>

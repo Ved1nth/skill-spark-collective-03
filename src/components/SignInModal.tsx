@@ -106,30 +106,30 @@ const SignInModal = ({ isOpen, onClose, onSignIn }: SignInModalProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="relative">
+      <Card className="w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto">
+        <CardHeader className="relative p-4 md:p-6">
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="absolute right-0 top-0"
+            className="absolute right-2 top-2 p-2"
           >
             <X className="h-4 w-4" />
           </Button>
-          <div className="flex items-center space-x-2 mb-2">
-            <CheckCircle className="h-6 w-6 text-primary" />
-            <CardTitle className="text-2xl">Welcome to GTA</CardTitle>
+          <div className="flex items-center space-x-2 mb-2 pr-8">
+            <CheckCircle className="h-5 md:h-6 w-5 md:w-6 text-primary" />
+            <CardTitle className="text-xl md:text-2xl">Welcome to GTA</CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-sm md:text-base">
             Sign in with your RNSIT email to connect with talented students
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="p-4 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name */}
             <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
+              <Label htmlFor="fullName" className="text-sm md:text-base">Full Name</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -138,7 +138,7 @@ const SignInModal = ({ isOpen, onClose, onSignIn }: SignInModalProps) => {
                   placeholder="Enter your full name"
                   value={formData.fullName}
                   onChange={(e) => handleInputChange('fullName', e.target.value)}
-                  className={`pl-10 ${errors.fullName ? 'border-red-500' : ''}`}
+                  className={`pl-10 text-sm md:text-base py-2.5 md:py-3 ${errors.fullName ? 'border-red-500' : ''}`}
                 />
               </div>
               {errors.fullName && <p className="text-sm text-red-500">{errors.fullName}</p>}
@@ -223,11 +223,11 @@ const SignInModal = ({ isOpen, onClose, onSignIn }: SignInModalProps) => {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full gradient-electric text-primary-foreground"
+              className="w-full gradient-electric text-primary-foreground py-2.5 md:py-3 text-sm md:text-base"
               disabled={isLoading}
             >
               {isLoading ? (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   <span>Signing In...</span>
                 </div>
@@ -237,7 +237,7 @@ const SignInModal = ({ isOpen, onClose, onSignIn }: SignInModalProps) => {
             </Button>
           </form>
 
-          <div className="mt-4 text-center text-sm text-muted-foreground">
+          <div className="mt-4 text-center text-xs md:text-sm text-muted-foreground">
             <p>By signing in, you agree to connect with fellow RNSIT students</p>
           </div>
         </CardContent>
