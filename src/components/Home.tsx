@@ -4,10 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import SignInModal from './SignInModal';
 
 const Home = () => {
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
+  const [user, setUser] = useState<any>(null);
   
   const skills = [
     { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
@@ -58,9 +61,19 @@ const Home = () => {
   };
 
   const handleSignIn = () => {
-    console.log('Sign In clicked - would open sign-in modal');
-    // For now, just show an alert - later this would open a sign-in modal
-    alert('Sign-in feature coming soon! For now, enjoy browsing freely.');
+    console.log('Sign In clicked - opening sign-in modal');
+    setShowSignInModal(true);
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('gta_user');
+    setUser(null);
+    console.log('User signed out');
+  };
+
+  const handleUserSignIn = (userData: any) => {
+    setUser(userData);
+    console.log('User signed in:', userData);
   };
 
   const handleGetStarted = () => {
@@ -122,6 +135,14 @@ const Home = () => {
     }
   }, [isDarkMode]);
 
+  // Check for existing user on component mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('gta_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-soft">
       {/* Header */}
@@ -160,19 +181,38 @@ const Home = () => {
                   <Moon className="h-4 w-4" />
                 )}
               </Button>
-              <Button 
-                variant="ghost" 
-                className="text-muted-foreground hover:text-primary"
-                onClick={handleSignIn}
-              >
-                Sign In
-              </Button>
-              <Button 
-                className="gradient-electric text-primary-foreground hover:opacity-90 electric-glow"
-                onClick={handleGetStarted}
-              >
-                Get Started
-              </Button>
+              
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Welcome, </span>
+                    <span className="font-medium">{user.fullName.split(' ')[0]}</span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    className="text-muted-foreground hover:text-primary"
+                    onClick={handleSignOut}
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="text-muted-foreground hover:text-primary"
+                    onClick={handleSignIn}
+                  >
+                    Sign In
+                  </Button>
+                  <Button 
+                    className="gradient-electric text-primary-foreground hover:opacity-90 electric-glow"
+                    onClick={handleGetStarted}
+                  >
+                    Get Started
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -381,6 +421,13 @@ const Home = () => {
           </Button>
         </div>
       </section>
+
+      {/* Sign In Modal */}
+      <SignInModal 
+        isOpen={showSignInModal}
+        onClose={() => setShowSignInModal(false)}
+        onSignIn={handleUserSignIn}
+      />
     </div>
   );
 };
