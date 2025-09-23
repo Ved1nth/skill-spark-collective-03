@@ -7,44 +7,44 @@ interface SplashScreenProps {
 }
 
 const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
-  const [showBolt, setShowBolt] = useState(false);
-  const [showAppName, setShowAppName] = useState(false);
-  const [showGoToApp, setShowGoToApp] = useState(false);
+  const [showG, setShowG] = useState(false);
+  const [showT, setShowT] = useState(false);
+  const [showA, setShowA] = useState(false);
   const [animateOut, setAnimateOut] = useState(false);
 
   useEffect(() => {
-    console.log('SplashScreen mounted - starting 2s animation sequence');
+    console.log('SplashScreen mounted - starting letter animations');
     
-    // Stage 1: Show electric bolt (0.2s delay)
-    const boltTimer = setTimeout(() => {
-      setShowBolt(true);
-    }, 200);
+    // Stage 1: Show G (0.3s delay)
+    const gTimer = setTimeout(() => {
+      setShowG(true);
+    }, 300);
 
-    // Stage 2: Show GTA app name (0.8s)
-    const appNameTimer = setTimeout(() => {
-      setShowAppName(true);
-    }, 800);
+    // Stage 2: Show T (0.6s)
+    const tTimer = setTimeout(() => {
+      setShowT(true);
+    }, 600);
 
-    // Stage 3: Show "Go to App" text (1.4s)
-    const goToAppTimer = setTimeout(() => {
-      setShowGoToApp(true);
-    }, 1400);
+    // Stage 3: Show A (0.9s)
+    const aTimer = setTimeout(() => {
+      setShowA(true);
+    }, 900);
 
-    // Stage 4: Start animate out (1.8s)
+    // Stage 4: Start animate out all together (1.5s)
     const animateOutTimer = setTimeout(() => {
       setAnimateOut(true);
-    }, 1800);
+    }, 1500);
 
-    // Stage 5: Complete transition to main app (2.2s)
+    // Stage 5: Complete transition to main app (2.0s)
     const completeTimer = setTimeout(() => {
-      console.log('Animation sequence complete - transitioning to main app');
+      console.log('Letter animation sequence complete - transitioning to main app');
       onEnterApp();
-    }, 2200);
+    }, 2000);
 
     return () => {
-      clearTimeout(boltTimer);
-      clearTimeout(appNameTimer);
-      clearTimeout(goToAppTimer);
+      clearTimeout(gTimer);
+      clearTimeout(tTimer);
+      clearTimeout(aTimer);
       clearTimeout(animateOutTimer);
       clearTimeout(completeTimer);
     };
@@ -55,44 +55,39 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
       {/* Background electric effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-primary/5 to-black" />
       
-      {/* Electric bolt animation */}
-      {showBolt && (
-        <div className={`relative z-10 transition-all duration-300 ${showBolt ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}>
-          <img 
-            src={electricBolt} 
-            alt="Electric Bolt" 
-            className="w-48 h-36 object-contain drop-shadow-2xl electric-pulse"
-            style={{
-              filter: 'drop-shadow(0 0 30px hsl(217 91% 60% / 0.8))'
-            }}
-          />
-          
-          {/* Sparkle effects around the bolt */}
-          <div className="absolute -top-4 -left-4 w-2 h-2 bg-primary rounded-full animate-ping" />
-          <div className="absolute -bottom-2 -right-2 w-1 h-1 bg-primary rounded-full animate-ping animation-delay-300" />
-          <div className="absolute top-1/2 -left-8 w-1.5 h-1.5 bg-primary rounded-full animate-ping animation-delay-700" />
+      {/* Individual Letter Animations - G T A */}
+      <div className="flex items-center justify-center space-x-4">
+        {/* Letter G */}
+        <div className={`transition-all duration-700 ${showG ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-50'}`}>
+          <span className="text-8xl font-bold text-primary electric-pulse" 
+                style={{ filter: 'drop-shadow(0 0 20px hsl(217 91% 60% / 0.8))' }}>
+            G
+          </span>
         </div>
-      )}
 
-      {/* GTA App Name */}
-      {showAppName && (
-        <div className={`mt-8 text-center transition-all duration-500 ${showAppName ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <h1 className="text-6xl font-bold text-white mb-2 tracking-wider">
-            <span className="text-primary electric-pulse">GTA</span>
-          </h1>
-          <p className="text-gray-400 text-lg">
-            Go To App
-          </p>
+        {/* Letter T */}
+        <div className={`transition-all duration-700 ${showT ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-50'}`}>
+          <span className="text-8xl font-bold text-primary electric-pulse" 
+                style={{ filter: 'drop-shadow(0 0 20px hsl(217 91% 60% / 0.8))' }}>
+            T
+          </span>
         </div>
-      )}
 
-      {/* Go to App Text */}
-      {showGoToApp && (
-        <div className={`mt-8 text-center transition-all duration-500 ${showGoToApp ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <p className="text-2xl text-white font-semibold tracking-wide">
-            Go to App
+        {/* Letter A */}
+        <div className={`transition-all duration-700 ${showA ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-50'}`}>
+          <span className="text-8xl font-bold text-primary electric-pulse" 
+                style={{ filter: 'drop-shadow(0 0 20px hsl(217 91% 60% / 0.8))' }}>
+            A
+          </span>
+        </div>
+      </div>
+
+      {/* Subtitle appears after all letters are shown */}
+      {showA && (
+        <div className={`mt-8 text-center transition-all duration-500 ${showA ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <p className="text-gray-400 text-xl tracking-widest">
+            GO TO APP
           </p>
-          <div className="w-24 h-1 bg-gradient-electric mx-auto mt-2 rounded-full" />
         </div>
       )}
 

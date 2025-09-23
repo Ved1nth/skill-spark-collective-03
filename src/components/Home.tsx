@@ -35,6 +35,43 @@ const Home = () => {
     },
   ];
 
+  const scrollToSkills = () => {
+    const skillsSection = document.getElementById('skills-section');
+    skillsSection?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToActivities = () => {
+    const activitiesSection = document.getElementById('activities-section');
+    activitiesSection?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSignIn = () => {
+    console.log('Sign In clicked - would open sign-in modal');
+    // For now, just show an alert - later this would open a sign-in modal
+    alert('Sign-in feature coming soon! For now, enjoy browsing freely.');
+  };
+
+  const handleGetStarted = () => {
+    console.log('Get Started clicked - would open sign-up modal');
+    // For now, just show an alert - later this would open a sign-up modal  
+    alert('Sign-up feature coming soon! Continue exploring to see what we offer.');
+  };
+
+  const handleFindTalent = () => {
+    console.log('Find Talent clicked - scrolling to skills');
+    scrollToSkills();
+  };
+
+  const handleBrowseActivities = () => {
+    console.log('Browse Activities clicked - scrolling to activities');
+    scrollToActivities();
+  };
+
+  const handleStartConnecting = () => {
+    console.log('Start Connecting clicked - would show sign-up prompt');
+    alert('Ready to connect? Sign up to start messaging talented students and joining activities!');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-soft">
       {/* Header */}
@@ -60,10 +97,17 @@ const Home = () => {
             </div>
 
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" className="text-muted-foreground hover:text-primary">
+              <Button 
+                variant="ghost" 
+                className="text-muted-foreground hover:text-primary"
+                onClick={handleSignIn}
+              >
                 Sign In
               </Button>
-              <Button className="gradient-electric text-primary-foreground hover:opacity-90 electric-glow">
+              <Button 
+                className="gradient-electric text-primary-foreground hover:opacity-90 electric-glow"
+                onClick={handleGetStarted}
+              >
                 Get Started
               </Button>
             </div>
@@ -82,11 +126,20 @@ const Home = () => {
             based on shared interests and complementary skills.
           </p>
           <div className="flex items-center justify-center space-x-4">
-            <Button size="lg" className="gradient-electric text-primary-foreground electric-glow">
+            <Button 
+              size="lg" 
+              className="gradient-electric text-primary-foreground electric-glow"
+              onClick={handleFindTalent}
+            >
               <Users className="mr-2 h-5 w-5" />
               Find Talent
             </Button>
-            <Button size="lg" variant="outline" className="border-primary/20 hover:bg-primary/5">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-primary/20 hover:bg-primary/5"
+              onClick={handleBrowseActivities}
+            >
               <Calendar className="mr-2 h-5 w-5" />
               Browse Activities
             </Button>
@@ -95,7 +148,7 @@ const Home = () => {
       </section>
 
       {/* Skills Section */}
-      <section className="py-12 px-4 bg-background/50">
+      <section id="skills-section" className="py-12 px-4 bg-background/50">
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-3xl font-bold">Popular Skills</h3>
@@ -129,7 +182,7 @@ const Home = () => {
       </section>
 
       {/* Activities Section */}
-      <section className="py-12 px-4">
+      <section id="activities-section" className="py-12 px-4">
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-3xl font-bold">Active Communities</h3>
@@ -178,7 +231,11 @@ const Home = () => {
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
             Join thousands of students already connecting through shared passions and skills.
           </p>
-          <Button size="lg" className="gradient-electric text-primary-foreground electric-glow">
+          <Button 
+            size="lg" 
+            className="gradient-electric text-primary-foreground electric-glow"
+            onClick={handleStartConnecting}
+          >
             Start Connecting Today
           </Button>
         </div>
