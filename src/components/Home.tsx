@@ -146,8 +146,76 @@ const Home = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto text-center">
+      <section className="py-16 px-4 relative overflow-hidden">
+        {/* Animated Background Graphics */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Floating Skill Icons */}
+          <div className="absolute top-20 left-10 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center animate-float-slow">
+            <Code className="h-6 w-6 text-primary/60" />
+          </div>
+          <div className="absolute top-32 right-20 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center animate-float-delayed">
+            <Camera className="h-5 w-5 text-purple-500" />
+          </div>
+          <div className="absolute bottom-32 left-20 w-14 h-14 rounded-full bg-green-100 flex items-center justify-center animate-float-reverse">
+            <PenTool className="h-7 w-7 text-green-500" />
+          </div>
+          <div className="absolute top-40 right-40 w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center animate-float-slow">
+            <Palette className="h-4 w-4 text-orange-500" />
+          </div>
+          <div className="absolute bottom-40 right-16 w-11 h-11 rounded-full bg-blue-100 flex items-center justify-center animate-float-delayed">
+            <Video className="h-5 w-5 text-blue-500" />
+          </div>
+          <div className="absolute top-60 left-32 w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center animate-float-reverse">
+            <Mic className="h-4 w-4 text-yellow-500" />
+          </div>
+
+          {/* Connection Lines */}
+          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
+              </linearGradient>
+            </defs>
+            
+            {/* Animated connection lines */}
+            <path
+              d="M100,80 Q200,120 300,100 T500,90"
+              stroke="url(#connectionGradient)"
+              strokeWidth="2"
+              fill="none"
+              className="animate-draw-line"
+            />
+            <path
+              d="M150,200 Q250,160 400,180 T600,170"
+              stroke="url(#connectionGradient)"
+              strokeWidth="1.5"
+              fill="none"
+              className="animate-draw-line-delayed"
+            />
+            <path
+              d="M80,300 Q180,260 280,280 T480,270"
+              stroke="url(#connectionGradient)"
+              strokeWidth="1"
+              fill="none"
+              className="animate-draw-line-reverse"
+            />
+          </svg>
+
+          {/* Floating Particles */}
+          <div className="absolute top-24 left-1/4 w-2 h-2 bg-primary/40 rounded-full animate-pulse-float"></div>
+          <div className="absolute bottom-32 right-1/3 w-1.5 h-1.5 bg-purple-400/50 rounded-full animate-pulse-float-delayed"></div>
+          <div className="absolute top-48 right-1/4 w-3 h-3 bg-green-400/30 rounded-full animate-pulse-float-reverse"></div>
+          <div className="absolute bottom-48 left-1/3 w-2.5 h-2.5 bg-orange-400/40 rounded-full animate-pulse-float"></div>
+          <div className="absolute top-36 left-2/3 w-1 h-1 bg-blue-400/60 rounded-full animate-pulse-float-delayed"></div>
+
+          {/* Gradient Orbs */}
+          <div className="absolute top-16 right-12 w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full blur-xl animate-blob"></div>
+          <div className="absolute bottom-20 left-16 w-40 h-40 bg-gradient-to-br from-purple-400/15 to-pink-400/10 rounded-full blur-2xl animate-blob-delayed"></div>
+          <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-gradient-to-br from-green-400/20 to-blue-400/10 rounded-full blur-xl animate-blob-reverse"></div>
+        </div>
+
+        <div className="container mx-auto text-center relative z-10">
           <h2 className="text-5xl font-bold mb-6 gradient-electric bg-clip-text text-transparent">
             Connect Through Skills
           </h2>
