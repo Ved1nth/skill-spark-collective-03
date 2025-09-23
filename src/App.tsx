@@ -8,6 +8,8 @@ import SplashScreen from "./components/SplashScreen";
 import Home from "./components/Home";
 import SkillDetail from "./components/SkillDetail";
 import ActivityDetail from "./components/ActivityDetail";
+import AllSkills from "./components/AllSkills";
+import AllActivities from "./components/AllActivities";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +46,8 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/skills" element={<AllSkills />} />
+            <Route path="/activities" element={<AllActivities />} />
             <Route path="/skill/:skillId" element={<SkillDetail />} />
             <Route path="/activity/:activityId" element={<ActivityDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -1,4 +1,4 @@
-import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette } from 'lucide-react';
+import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,9 +9,13 @@ const Home = () => {
   
   const skills = [
     { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
-    { id: 'photography', name: 'Photography', icon: Camera, count: 89, color: 'bg-purple-100 text-purple-600' },
-    { id: 'music-production', name: 'Music Production', icon: Music, count: 67, color: 'bg-green-100 text-green-600' },
     { id: 'graphic-design', name: 'Graphic Design', icon: Palette, count: 103, color: 'bg-orange-100 text-orange-600' },
+    { id: 'writing-services', name: 'Writing & Assignments', icon: PenTool, count: 156, color: 'bg-green-100 text-green-600' },
+    { id: 'video-editing', name: 'Video Editing', icon: Video, count: 78, color: 'bg-red-100 text-red-600' },
+    { id: 'digital-marketing', name: 'Digital Marketing', icon: TrendingUp, count: 92, color: 'bg-pink-100 text-pink-600' },
+    { id: 'photography', name: 'Photography', icon: Camera, count: 89, color: 'bg-purple-100 text-purple-600' },
+    { id: 'music-production', name: 'Music Production', icon: Music, count: 67, color: 'bg-indigo-100 text-indigo-600' },
+    { id: 'voice-over', name: 'Voice Over', icon: Mic, count: 45, color: 'bg-yellow-100 text-yellow-600' },
   ];
 
   const activities = [
@@ -81,6 +85,16 @@ const Home = () => {
   const handleActivityClick = (activityId: string) => {
     console.log('Activity clicked:', activityId);
     navigate(`/activity/${activityId}`);
+  };
+
+  const handleViewAllSkills = () => {
+    console.log('View All Skills clicked');
+    navigate('/skills');
+  };
+
+  const handleExploreAll = () => {
+    console.log('Explore All clicked');
+    navigate('/activities');
   };
 
   const handleStartConnecting = () => {
@@ -168,7 +182,11 @@ const Home = () => {
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-3xl font-bold">Skills and Service</h3>
-            <Button variant="ghost" className="text-primary hover:bg-primary/10">
+            <Button 
+              variant="ghost" 
+              className="text-primary hover:bg-primary/10"
+              onClick={handleViewAllSkills}
+            >
               View All Skills →
             </Button>
           </div>
@@ -203,7 +221,11 @@ const Home = () => {
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-3xl font-bold">Activity and Events</h3>
-            <Button variant="ghost" className="text-primary hover:bg-primary/10">
+            <Button 
+              variant="ghost" 
+              className="text-primary hover:bg-primary/10"
+              onClick={handleExploreAll}
+            >
               Explore All →
             </Button>
           </div>
