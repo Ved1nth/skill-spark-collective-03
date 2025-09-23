@@ -111,41 +111,312 @@ const SkillDetail = () => {
     },
   ];
 
-  // Mock communities data
-  const communities = [
-    {
-      id: 1,
-      title: 'React Developers Hub',
-      description: 'Discussion and help for React developers',
-      members: 45,
-      posts: 234,
-      lastActivity: '2 hours ago'
-    },
-    {
-      id: 2,
-      title: 'Full-Stack Projects',
-      description: 'Share and collaborate on full-stack projects',
-      members: 32,
-      posts: 156,
-      lastActivity: '5 hours ago'
-    },
-    {
-      id: 3,
-      title: 'Web Dev Career Tips',
-      description: 'Career guidance and industry insights',
-      members: 67,
-      posts: 89,
-      lastActivity: '1 day ago'
-    },
-    {
-      id: 4,
-      title: 'Code Review Circle',
-      description: 'Get feedback on your code and projects',
-      members: 28,
-      posts: 178,
-      lastActivity: '3 hours ago'
-    },
-  ];
+  // Mock communities data for this skill - different communities per skill type
+  const getCommunitiesForSkill = (skillId: string) => {
+    switch (skillId) {
+      case 'web-development':
+        return [
+          {
+            id: 1,
+            title: 'React Developers Hub',
+            description: 'Discussion and help for React developers',
+            members: 45,
+            posts: 234,
+            lastActivity: '2 hours ago'
+          },
+          {
+            id: 2,
+            title: 'Full-Stack Projects',
+            description: 'Share and collaborate on full-stack projects',
+            members: 32,
+            posts: 156,
+            lastActivity: '5 hours ago'
+          },
+          {
+            id: 3,
+            title: 'Web Dev Career Tips',
+            description: 'Career guidance and industry insights',
+            members: 67,
+            posts: 89,
+            lastActivity: '1 day ago'
+          },
+          {
+            id: 4,
+            title: 'Code Review Circle',
+            description: 'Get feedback on your code and projects',
+            members: 28,
+            posts: 178,
+            lastActivity: '3 hours ago'
+          }
+        ];
+
+      case 'video-editing':
+        return [
+          {
+            id: 1,
+            title: 'Adobe Premiere Pro Masters',
+            description: 'Advanced techniques and tips for Premiere Pro editing',
+            members: 38,
+            posts: 145,
+            lastActivity: '1 hour ago'
+          },
+          {
+            id: 2,
+            title: 'DaVinci Resolve Community',
+            description: 'Color grading and editing with DaVinci Resolve',
+            members: 42,
+            posts: 198,
+            lastActivity: '3 hours ago'
+          },
+          {
+            id: 3,
+            title: 'Motion Graphics & Effects',
+            description: 'After Effects, animations, and visual effects',
+            members: 29,
+            posts: 87,
+            lastActivity: '2 hours ago'
+          },
+          {
+            id: 4,
+            title: 'YouTuber Editors Network',
+            description: 'Community for YouTube content creators and editors',
+            members: 56,
+            posts: 234,
+            lastActivity: '30 minutes ago'
+          }
+        ];
+
+      case 'graphic-design':
+        return [
+          {
+            id: 1,
+            title: 'Photoshop Professionals',
+            description: 'Advanced Photoshop techniques and tutorials',
+            members: 52,
+            posts: 167,
+            lastActivity: '45 minutes ago'
+          },
+          {
+            id: 2,
+            title: 'Illustrator Artists',
+            description: 'Vector art, logos, and illustration community',
+            members: 34,
+            posts: 123,
+            lastActivity: '2 hours ago'
+          },
+          {
+            id: 3,
+            title: 'Brand Identity Designers',
+            description: 'Logo design, branding, and corporate identity',
+            members: 41,
+            posts: 98,
+            lastActivity: '4 hours ago'
+          },
+          {
+            id: 4,
+            title: 'Freelance Design Network',
+            description: 'Tips for freelance designers and client management',
+            members: 63,
+            posts: 201,
+            lastActivity: '1 hour ago'
+          }
+        ];
+
+      case 'writing-services':
+        return [
+          {
+            id: 1,
+            title: 'Academic Writing Hub',
+            description: 'Research papers, essays, and academic assignments',
+            members: 78,
+            posts: 312,
+            lastActivity: '20 minutes ago'
+          },
+          {
+            id: 2,
+            title: 'Creative Writers Circle',
+            description: 'Fiction, poetry, and creative writing community',
+            members: 45,
+            posts: 189,
+            lastActivity: '1 hour ago'
+          },
+          {
+            id: 3,
+            title: 'Content Marketing Writers',
+            description: 'Blog posts, articles, and marketing content',
+            members: 62,
+            posts: 245,
+            lastActivity: '2 hours ago'
+          },
+          {
+            id: 4,
+            title: 'Proofreading & Editing',
+            description: 'Grammar, style, and editing support community',
+            members: 39,
+            posts: 156,
+            lastActivity: '3 hours ago'
+          }
+        ];
+
+      case 'digital-marketing':
+        return [
+          {
+            id: 1,
+            title: 'Social Media Strategists',
+            description: 'Instagram, TikTok, and social media marketing',
+            members: 67,
+            posts: 234,
+            lastActivity: '15 minutes ago'
+          },
+          {
+            id: 2,
+            title: 'SEO & Content Marketing',
+            description: 'Search engine optimization and content strategy',
+            members: 43,
+            posts: 178,
+            lastActivity: '1 hour ago'
+          },
+          {
+            id: 3,
+            title: 'Google Ads & PPC',
+            description: 'Paid advertising and campaign optimization',
+            members: 31,
+            posts: 124,
+            lastActivity: '2 hours ago'
+          },
+          {
+            id: 4,
+            title: 'Email Marketing Masters',
+            description: 'Email campaigns, automation, and newsletters',
+            members: 28,
+            posts: 98,
+            lastActivity: '4 hours ago'
+          }
+        ];
+
+      case 'photography':
+        return [
+          {
+            id: 1,
+            title: 'Portrait Photography',
+            description: 'Portrait techniques, lighting, and posing',
+            members: 54,
+            posts: 198,
+            lastActivity: '30 minutes ago'
+          },
+          {
+            id: 2,
+            title: 'Landscape & Nature',
+            description: 'Outdoor photography and nature shots',
+            members: 46,
+            posts: 167,
+            lastActivity: '2 hours ago'
+          },
+          {
+            id: 3,
+            title: 'Wedding Photographers',
+            description: 'Event photography and wedding coverage',
+            members: 38,
+            posts: 134,
+            lastActivity: '1 hour ago'
+          },
+          {
+            id: 4,
+            title: 'Photo Editing & Lightroom',
+            description: 'Post-processing and photo editing techniques',
+            members: 61,
+            posts: 223,
+            lastActivity: '45 minutes ago'
+          }
+        ];
+
+      case 'music-production':
+        return [
+          {
+            id: 1,
+            title: 'FL Studio Producers',
+            description: 'Beat making and music production in FL Studio',
+            members: 49,
+            posts: 187,
+            lastActivity: '1 hour ago'
+          },
+          {
+            id: 2,
+            title: 'Ableton Live Community',
+            description: 'Electronic music production and live performance',
+            members: 36,
+            posts: 145,
+            lastActivity: '2 hours ago'
+          },
+          {
+            id: 3,
+            title: 'Hip-Hop Producers',
+            description: 'Rap beats, sampling, and hip-hop production',
+            members: 42,
+            posts: 201,
+            lastActivity: '30 minutes ago'
+          },
+          {
+            id: 4,
+            title: 'Audio Mixing & Mastering',
+            description: 'Professional mixing and mastering techniques',
+            members: 33,
+            posts: 112,
+            lastActivity: '3 hours ago'
+          }
+        ];
+
+      case 'voice-over':
+        return [
+          {
+            id: 1,
+            title: 'Voice Acting Network',
+            description: 'Character voices and animation voice work',
+            members: 27,
+            posts: 89,
+            lastActivity: '2 hours ago'
+          },
+          {
+            id: 2,
+            title: 'Commercial Voice Over',
+            description: 'Advertising, commercials, and promotional content',
+            members: 34,
+            posts: 123,
+            lastActivity: '1 hour ago'
+          },
+          {
+            id: 3,
+            title: 'Audiobook Narrators',
+            description: 'Long-form narration and audiobook production',
+            members: 19,
+            posts: 67,
+            lastActivity: '4 hours ago'
+          },
+          {
+            id: 4,
+            title: 'Home Studio Setup',
+            description: 'Recording equipment and studio acoustics',
+            members: 25,
+            posts: 98,
+            lastActivity: '3 hours ago'
+          }
+        ];
+
+      default:
+        return [
+          {
+            id: 1,
+            title: 'General Discussion',
+            description: 'Open discussion about this skill',
+            members: 20,
+            posts: 50,
+            lastActivity: '1 hour ago'
+          }
+        ];
+    }
+  };
+
+  const communities = getCommunitiesForSkill(skillId!);
 
   const handleContactPerson = (personName: string) => {
     alert(`Contact feature coming soon! For now, you can browse ${personName}'s profile freely.`);
