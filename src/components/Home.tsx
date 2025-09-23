@@ -2,13 +2,16 @@ import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette } from 'luci
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
+  
   const skills = [
-    { name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
-    { name: 'Photography', icon: Camera, count: 89, color: 'bg-purple-100 text-purple-600' },
-    { name: 'Music Production', icon: Music, count: 67, color: 'bg-green-100 text-green-600' },
-    { name: 'Graphic Design', icon: Palette, count: 103, color: 'bg-orange-100 text-orange-600' },
+    { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
+    { id: 'photography', name: 'Photography', icon: Camera, count: 89, color: 'bg-purple-100 text-purple-600' },
+    { id: 'music-production', name: 'Music Production', icon: Music, count: 67, color: 'bg-green-100 text-green-600' },
+    { id: 'graphic-design', name: 'Graphic Design', icon: Palette, count: 103, color: 'bg-orange-100 text-orange-600' },
   ];
 
   const activities = [
@@ -65,6 +68,17 @@ const Home = () => {
   const handleBrowseActivities = () => {
     console.log('Browse Activities clicked - scrolling to activities');
     scrollToActivities();
+  };
+
+  const handleSkillClick = (skillId: string) => {
+    console.log('Skill clicked:', skillId);
+    navigate(`/skill/${skillId}`);
+  };
+
+  const handleActivityClick = (activityTitle: string) => {
+    console.log('Activity clicked:', activityTitle);
+    // Later this would navigate to activity detail page
+    alert(`${activityTitle} details coming soon! For now, browse freely.`);
   };
 
   const handleStartConnecting = () => {
@@ -151,7 +165,7 @@ const Home = () => {
       <section id="skills-section" className="py-12 px-4 bg-background/50">
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-3xl font-bold">Popular Skills</h3>
+            <h3 className="text-3xl font-bold">Skills and Service</h3>
             <Button variant="ghost" className="text-primary hover:bg-primary/10">
               View All Skills →
             </Button>
@@ -162,8 +176,9 @@ const Home = () => {
               const IconComponent = skill.icon;
               return (
                 <Card 
-                  key={skill.name} 
+                  key={skill.id} 
                   className="group hover:shadow-lg transition-smooth cursor-pointer border-border/50 hover:border-primary/20"
+                  onClick={() => handleSkillClick(skill.id)}
                 >
                   <CardHeader className="pb-3">
                     <div className={`w-12 h-12 rounded-lg ${skill.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-smooth`}>
@@ -196,6 +211,7 @@ const Home = () => {
               <Card 
                 key={activity.title}
                 className="group hover:shadow-lg transition-smooth cursor-pointer overflow-hidden border-border/50 hover:border-primary/20"
+                onClick={() => handleActivityClick(activity.title)}
               >
                 <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 relative overflow-hidden">
                   <img 
