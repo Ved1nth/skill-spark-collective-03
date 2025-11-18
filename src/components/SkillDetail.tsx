@@ -82,34 +82,34 @@ const SkillDetail = () => {
     {
       id: 1,
       name: 'Arjun Sharma',
-      bio: 'Full-stack developer with 3 years experience',
+      bio: 'CSE student at RNS Institute Of Tech, passionate about full-stack development',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
       skills: ['React', 'Node.js', 'TypeScript'],
-      year: 'Junior'
+      year: '3rd Year'
     },
     {
       id: 2,
       name: 'Priya Patel',
-      bio: 'Frontend specialist passionate about UX',
+      bio: 'ISE student at RNS Institute Of Tech, specializing in frontend development and UI/UX',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
       skills: ['React', 'CSS', 'Figma'],
-      year: 'Senior'
+      year: '4th Year'
     },
     {
       id: 3,
       name: 'Rohan Kumar',
-      bio: 'Backend engineer and API architect',
+      bio: 'CSE student at RNS Institute Of Tech, building scalable backend systems',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
       skills: ['Python', 'Django', 'PostgreSQL'],
-      year: 'Graduate'
+      year: '2nd Year'
     },
     {
       id: 4,
       name: 'Ananya Reddy',
-      bio: 'DevOps and cloud infrastructure expert',
+      bio: 'CSE student at RNS Institute Of Tech, exploring cloud computing and DevOps',
       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
       skills: ['AWS', 'Docker', 'Kubernetes'],
-      year: 'Senior'
+      year: '4th Year'
     },
   ];
 
