@@ -81,7 +81,7 @@ const SkillDetail = () => {
   const people = [
     {
       id: 1,
-      name: 'Alex Johnson',
+      name: 'Arjun Sharma',
       bio: 'Full-stack developer with 3 years experience',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
       skills: ['React', 'Node.js', 'TypeScript'],
@@ -89,7 +89,7 @@ const SkillDetail = () => {
     },
     {
       id: 2,
-      name: 'Sarah Chen',
+      name: 'Priya Patel',
       bio: 'Frontend specialist passionate about UX',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
       skills: ['React', 'CSS', 'Figma'],
@@ -97,7 +97,7 @@ const SkillDetail = () => {
     },
     {
       id: 3,
-      name: 'Mike Rodriguez',
+      name: 'Rohan Kumar',
       bio: 'Backend engineer and API architect',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
       skills: ['Python', 'Django', 'PostgreSQL'],
@@ -105,7 +105,7 @@ const SkillDetail = () => {
     },
     {
       id: 4,
-      name: 'Emma Wilson',
+      name: 'Ananya Reddy',
       bio: 'DevOps and cloud infrastructure expert',
       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
       skills: ['AWS', 'Docker', 'Kubernetes'],
