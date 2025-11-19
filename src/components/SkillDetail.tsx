@@ -83,9 +83,10 @@ const SkillDetail = () => {
       id: 1,
       name: 'Arjun Sharma',
       bio: 'CSE student at RNS Institute Of Tech, passionate about full-stack development',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face',
       skills: ['React', 'Node.js', 'TypeScript'],
-      year: '3rd Year'
+      year: '3rd Year',
+      branch: 'Computer Science'
     },
     {
       id: 2,
@@ -93,7 +94,8 @@ const SkillDetail = () => {
       bio: 'ISE student at RNS Institute Of Tech, specializing in frontend development and UI/UX',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
       skills: ['React', 'CSS', 'Figma'],
-      year: '4th Year'
+      year: '4th Year',
+      branch: 'Information Science'
     },
     {
       id: 3,
@@ -101,7 +103,8 @@ const SkillDetail = () => {
       bio: 'CSE student at RNS Institute Of Tech, building scalable backend systems',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
       skills: ['Python', 'Django', 'PostgreSQL'],
-      year: '2nd Year'
+      year: '2nd Year',
+      branch: 'Computer Science'
     },
     {
       id: 4,
@@ -109,7 +112,44 @@ const SkillDetail = () => {
       bio: 'CSE student at RNS Institute Of Tech, exploring cloud computing and DevOps',
       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
       skills: ['AWS', 'Docker', 'Kubernetes'],
-      year: '4th Year'
+      year: '4th Year',
+      branch: 'Computer Science'
+    },
+    {
+      id: 5,
+      name: 'Vikram Menon',
+      bio: 'ECE student at RNS Institute Of Tech, working on IoT and embedded systems',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+      skills: ['Arduino', 'C++', 'Circuit Design'],
+      year: '3rd Year',
+      branch: 'Electronics'
+    },
+    {
+      id: 6,
+      name: 'Sneha Iyer',
+      bio: 'ISE student at RNS Institute Of Tech, passionate about mobile app development',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
+      skills: ['Flutter', 'Dart', 'Firebase'],
+      year: '2nd Year',
+      branch: 'Information Science'
+    },
+    {
+      id: 7,
+      name: 'Aditya Nair',
+      bio: 'CSE student at RNS Institute Of Tech, interested in AI and machine learning',
+      avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop&crop=face',
+      skills: ['Python', 'TensorFlow', 'Data Science'],
+      year: '4th Year',
+      branch: 'Computer Science'
+    },
+    {
+      id: 8,
+      name: 'Kavya Desai',
+      bio: 'ISE student at RNS Institute Of Tech, specializing in database management',
+      avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face',
+      skills: ['SQL', 'MongoDB', 'Redis'],
+      year: '3rd Year',
+      branch: 'Information Science'
     },
   ];
 
