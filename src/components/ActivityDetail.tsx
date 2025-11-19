@@ -4,12 +4,34 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import MessagesModal from './MessagesModal';
 
 const ActivityDetail = () => {
   const { activityId } = useParams();
   const navigate = useNavigate();
-  const [isSignedIn, setIsSignedIn] = useState(false); // Mock auth state
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [showMessagesModal, setShowMessagesModal] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+
+  // Check for existing user on component mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('gta_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      setIsSignedIn(true);
+    }
+  }, []);
+
+  const handleMessageClick = (person: any) => {
+    if (!user) {
+      alert('Please sign in to send messages');
+      return;
+    }
+    setSelectedPerson(person);
+    setShowMessagesModal(true);
+  };
 
   // Mock data - in a real app this would come from an API
   const activityData = {
@@ -63,10 +85,13 @@ const ActivityDetail = () => {
             nextEvent: 'This Saturday 6:00 AM',
             location: 'Blue Ridge Trail',
             owner: {
-              name: 'Sarah Johnson',
+              name: 'Priya Menon',
               avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
               title: 'Hiking Instructor',
-              experience: '5 years'
+              experience: '3 years',
+              branch: 'Mechanical Engineering',
+              year: '4th Year',
+              bio: 'ME student at RNS Institute Of Tech, passionate about outdoor activities'
             },
             isPrivate: false,
             tags: ['Beginner Friendly', 'Fitness', 'Nature']
@@ -80,10 +105,13 @@ const ActivityDetail = () => {
             nextEvent: 'Next Weekend',
             location: 'Mountain Peak Trail',
             owner: {
-              name: 'Mike Chen',
+              name: 'Rajesh Kumar',
               avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
               title: 'Mountain Guide',
-              experience: '8 years'
+              experience: '4 years',
+              branch: 'Civil Engineering',
+              year: '3rd Year',
+              bio: 'CE student at RNS Institute Of Tech, experienced in trekking and camping'
             },
             isPrivate: false,
             tags: ['Advanced', 'Camping', 'Challenge']
@@ -97,10 +125,13 @@ const ActivityDetail = () => {
             nextEvent: 'Sunday 7:00 AM',
             location: 'Scenic Valley',
             owner: {
-              name: 'Emma Wilson',
+              name: 'Ananya Sharma',
               avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
               title: 'Professional Photographer',
-              experience: '6 years'
+              experience: '2 years',
+              branch: 'Information Science',
+              year: '4th Year',
+              bio: 'ISE student at RNS Institute Of Tech, combining photography with hiking'
             },
             isPrivate: false,
             tags: ['Photography', 'Creative', 'Scenic']
@@ -114,10 +145,13 @@ const ActivityDetail = () => {
             nextEvent: 'This Sunday 10:00 AM',
             location: 'Gentle Meadow Trail',
             owner: {
-              name: 'Lisa Park',
+              name: 'Deepika Reddy',
               avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=100&h=100&fit=crop&crop=face',
               title: 'Family Coordinator',
-              experience: '4 years'
+              experience: '2 years',
+              branch: 'Biotechnology',
+              year: '2nd Year',
+              bio: 'BT student at RNS Institute Of Tech, organizing family-friendly activities'
             },
             isPrivate: false,
             tags: ['Family', 'Easy', 'Kids Welcome']
@@ -135,10 +169,13 @@ const ActivityDetail = () => {
             nextEvent: 'Thursday 7:00 PM',
             location: 'Tech Hub Conference Room A',
             owner: {
-              name: 'Alex Rodriguez',
+              name: 'Arjun Patel',
               avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
               title: 'Senior Frontend Developer',
-              experience: '6 years'
+              experience: '3 years',
+              branch: 'Computer Science',
+              year: '4th Year',
+              bio: 'CSE student at RNS Institute Of Tech, React enthusiast'
             },
             isPrivate: false,
             tags: ['React', 'Frontend', 'JavaScript']
@@ -152,10 +189,13 @@ const ActivityDetail = () => {
             nextEvent: 'Friday 6:30 PM',
             location: 'University Lab 201',
             owner: {
-              name: 'Dr. Priya Sharma',
+              name: 'Divya Krishnan',
               avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face',
-              title: 'Data Science Professor',
-              experience: '8 years'
+              title: 'AI/ML Researcher',
+              experience: '2 years',
+              branch: 'Computer Science',
+              year: '4th Year',
+              bio: 'CSE student at RNS Institute Of Tech, specializing in AI and machine learning'
             },
             isPrivate: false,
             tags: ['AI', 'Machine Learning', 'Python']
@@ -169,10 +209,13 @@ const ActivityDetail = () => {
             nextEvent: 'Wednesday 8:00 PM',
             location: 'Innovation Center',
             owner: {
-              name: 'Jordan Kim',
+              name: 'Karthik Iyer',
               avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-              title: 'Serial Entrepreneur',
-              experience: '10 years'
+              title: 'Startup Founder',
+              experience: '1 year',
+              branch: 'Information Science',
+              year: '3rd Year',
+              bio: 'ISE student at RNS Institute Of Tech, building tech startups'
             },
             isPrivate: true,
             tags: ['Entrepreneurship', 'Startups', 'Business']
@@ -186,10 +229,13 @@ const ActivityDetail = () => {
             nextEvent: 'Saturday 2:00 PM',
             location: 'Tech Cafe',
             owner: {
-              name: 'Maria Santos',
+              name: 'Meera Nair',
               avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
-              title: 'Mobile Tech Lead',
-              experience: '7 years'
+              title: 'Mobile Developer',
+              experience: '2 years',
+              branch: 'Information Science',
+              year: '4th Year',
+              bio: 'ISE student at RNS Institute Of Tech, Flutter and React Native developer'
             },
             isPrivate: false,
             tags: ['iOS', 'Android', 'Flutter']
@@ -203,10 +249,13 @@ const ActivityDetail = () => {
             nextEvent: 'Tuesday 7:30 PM',
             location: 'Online (Zoom)',
             owner: {
-              name: 'Chris Thompson',
+              name: 'Rohan Desai',
               avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
-              title: 'DevOps Architect',
-              experience: '9 years'
+              title: 'DevOps Engineer',
+              experience: '2 years',
+              branch: 'Computer Science',
+              year: '3rd Year',
+              bio: 'CSE student at RNS Institute Of Tech, cloud computing and DevOps specialist'
             },
             isPrivate: false,
             tags: ['DevOps', 'AWS', 'Docker']
@@ -220,10 +269,13 @@ const ActivityDetail = () => {
             nextEvent: 'Monday 8:00 PM',
             location: 'Security Lab',
             owner: {
-              name: 'Rachel Green',
+              name: 'Sneha Reddy',
               avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-              title: 'Security Consultant',
-              experience: '5 years'
+              title: 'Security Researcher',
+              experience: '2 years',
+              branch: 'Computer Science',
+              year: '4th Year',
+              bio: 'CSE student at RNS Institute Of Tech, passionate about cybersecurity'
             },
             isPrivate: true,
             tags: ['Security', 'Ethical Hacking', 'Privacy']
@@ -241,10 +293,13 @@ const ActivityDetail = () => {
             nextEvent: 'Tomorrow 3:00 PM',
             location: 'Library Study Room 3',
             owner: {
-              name: 'David Park',
+              name: 'Aditya Rao',
               avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
               title: 'Mathematics Tutor',
-              experience: '4 years'
+              experience: '1 year',
+              branch: 'Mathematics',
+              year: '3rd Year',
+              bio: 'Mathematics student at RNS Institute Of Tech, helping peers with calculus'
             },
             isPrivate: false,
             tags: ['Mathematics', 'Calculus', 'Exam Prep']
@@ -258,10 +313,13 @@ const ActivityDetail = () => {
             nextEvent: 'Wednesday 5:00 PM',
             location: 'Chemistry Building 205',
             owner: {
-              name: 'Sophie Chen',
+              name: 'Shruti Kulkarni',
               avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
-              title: 'Chemistry Graduate Student',
-              experience: '3 years'
+              title: 'Chemistry Lab Assistant',
+              experience: '2 years',
+              branch: 'Biotechnology',
+              year: '4th Year',
+              bio: 'BT student at RNS Institute Of Tech, specializing in organic chemistry'
             },
             isPrivate: false,
             tags: ['Chemistry', 'Lab Work', 'STEM']
@@ -275,10 +333,13 @@ const ActivityDetail = () => {
             nextEvent: 'Thursday 4:00 PM',
             location: 'Business School 101',
             owner: {
-              name: 'Michael Johnson',
+              name: 'Vikram Singh',
               avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-              title: 'Finance Professor',
-              experience: '7 years'
+              title: 'Business Student',
+              experience: '1 year',
+              branch: 'MBA',
+              year: '2nd Year',
+              bio: 'MBA student at RNS Institute Of Tech, interested in finance'
             },
             isPrivate: false,
             tags: ['Finance', 'Business', 'Accounting']
@@ -292,10 +353,13 @@ const ActivityDetail = () => {
             nextEvent: 'Friday 2:00 PM',
             location: 'Psychology Lab',
             owner: {
-              name: 'Dr. Amanda Wilson',
+              name: 'Kavya Menon',
               avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
               title: 'Psychology Researcher',
-              experience: '6 years'
+              experience: '2 years',
+              branch: 'Psychology',
+              year: '4th Year',
+              bio: 'Psychology student at RNS Institute Of Tech, conducting research'
             },
             isPrivate: false,
             tags: ['Psychology', 'Research', 'Statistics']
@@ -494,12 +558,28 @@ Description: ${group.description}
                           <AvatarImage src={group.owner.avatar} alt={group.owner.name} />
                           <AvatarFallback>{group.owner.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                         </Avatar>
-                        <div>
+                        <div className="flex-1">
                           <p className="font-medium text-sm">{group.owner.name}</p>
                           <p className="text-xs text-muted-foreground">
                             {group.owner.title} • {group.owner.experience}
                           </p>
+                          {group.owner.bio && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {group.owner.branch} • {group.owner.year}
+                            </p>
+                          )}
                         </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMessageClick(group.owner);
+                          }}
+                          className="hover:text-primary"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -530,6 +610,18 @@ Description: ${group.description}
           </div>
         </div>
       </section>
+
+      {/* Messages Modal */}
+      {showMessagesModal && (
+        <MessagesModal
+          isOpen={showMessagesModal}
+          onClose={() => {
+            setShowMessagesModal(false);
+            setSelectedPerson(null);
+          }}
+          currentUser={user}
+        />
+      )}
     </div>
   );
 };

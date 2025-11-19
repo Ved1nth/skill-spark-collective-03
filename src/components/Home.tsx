@@ -15,6 +15,7 @@ const Home = () => {
   const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const skills = [
     { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
@@ -81,9 +82,8 @@ const Home = () => {
   };
 
   const handleGetStarted = () => {
-    console.log('Get Started clicked - would open sign-up modal');
-    // For now, just show an alert - later this would open a sign-up modal  
-    alert('Sign-up feature coming soon! Continue exploring to see what we offer.');
+    console.log('Get Started clicked - opening sign-in modal');
+    setShowSignInModal(true);
   };
 
   const handleFindTalent = () => {
@@ -117,8 +117,39 @@ const Home = () => {
   };
 
   const handleStartConnecting = () => {
-    console.log('Start Connecting clicked - would show sign-up prompt');
-    alert('Ready to connect? Sign up to start messaging talented students and joining activities!');
+    if (!user) {
+      setShowSignInModal(true);
+    }
+  };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchTerm.trim()) {
+      const lowerSearch = searchTerm.toLowerCase();
+      
+      // Search in skills
+      const skillMatch = skills.find(skill => 
+        skill.name.toLowerCase().includes(lowerSearch)
+      );
+      if (skillMatch) {
+        navigate(`/skill/${skillMatch.id}`);
+        setSearchTerm('');
+        return;
+      }
+      
+      // Search in activities
+      const activityMatch = activities.find(activity => 
+        activity.title.toLowerCase().includes(lowerSearch)
+      );
+      if (activityMatch) {
+        navigate(`/activity/${activityMatch.id}`);
+        setSearchTerm('');
+        return;
+      }
+      
+      // If no exact match, go to all skills page
+      navigate('/skills');
+      setSearchTerm('');
+    }
   };
 
   const toggleTheme = () => {
@@ -185,6 +216,9 @@ const Home = () => {
                 <Input 
                   placeholder="Search skills, activities, or people..." 
                   className="pl-10 border-border/50 focus:ring-primary/20"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleSearch}
                 />
               </div>
             </div>
@@ -268,6 +302,9 @@ const Home = () => {
               <Input 
                 placeholder="Search skills, activities, or people..." 
                 className="pl-10 border-border/50 focus:ring-primary/20"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleSearch}
               />
             </div>
           </div>
@@ -453,22 +490,24 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 px-4 bg-gradient-to-r from-primary/5 to-primary/10">
-        <div className="container mx-auto text-center">
-          <h3 className="text-3xl font-bold mb-4">Ready to Make Connections?</h3>
-          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Join thousands of students already connecting through shared passions and skills.
-          </p>
-          <Button 
-            size="lg" 
-            className="gradient-electric text-primary-foreground electric-glow"
-            onClick={handleStartConnecting}
-          >
-            Start Connecting Today
-          </Button>
-        </div>
-      </section>
+      {/* CTA Section - Only show when user is not signed in */}
+      {!user && (
+        <section className="py-16 px-4 bg-gradient-to-r from-primary/5 to-primary/10">
+          <div className="container mx-auto text-center">
+            <h3 className="text-3xl font-bold mb-4">Ready to Make Connections?</h3>
+            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+              Join thousands of students already connecting through shared passions and skills.
+            </p>
+            <Button 
+              size="lg" 
+              className="gradient-electric text-primary-foreground electric-glow"
+              onClick={handleStartConnecting}
+            >
+              Start Connecting Today
+            </Button>
+          </div>
+        </section>
+      )}
 
       {/* Sign In Modal */}
       <SignInModal 
