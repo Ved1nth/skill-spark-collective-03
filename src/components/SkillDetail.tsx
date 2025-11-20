@@ -522,9 +522,27 @@ const SkillDetail = () => {
       return;
     }
 
+    // Create community entry in localStorage
+    const communities = JSON.parse(localStorage.getItem('user_communities') || '[]');
+    const communityId = `${skillId}-${communityTitle.toLowerCase().replace(/\s+/g, '-')}`;
+    
+    const existingCommunity = communities.find((c: any) => c.id === communityId);
+    if (!existingCommunity) {
+      communities.push({
+        id: communityId,
+        name: `${skill.name} - ${communityTitle}`,
+        members: [currentUser.id],
+        skillId: skillId
+      });
+      localStorage.setItem('user_communities', JSON.stringify(communities));
+    } else if (!existingCommunity.members.includes(currentUser.id)) {
+      existingCommunity.members.push(currentUser.id);
+      localStorage.setItem('user_communities', JSON.stringify(communities));
+    }
+
     toast({
       title: "Joined community!",
-      description: `You've successfully joined ${communityTitle}.`,
+      description: `You've successfully joined ${communityTitle}. Check your messages!`,
     });
   };
 

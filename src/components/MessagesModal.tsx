@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { X, MessageCircle, Send, User, Phone, Video, Info, Search, ArrowLeft } from 'lucide-react';
+import { X, MessageCircle, Send, User, Phone, Video, Info, Search, ArrowLeft, Users as UsersIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Message {
   id: string;
@@ -17,6 +18,7 @@ interface Message {
   content: string;
   timestamp: string;
   read: boolean;
+  type?: 'individual' | 'community';
 }
 
 interface Conversation {
@@ -26,6 +28,8 @@ interface Conversation {
   lastMessage: string;
   lastMessageTime: string;
   unreadCount: number;
+  type: 'individual' | 'community';
+  communityName?: string;
 }
 
 interface MessagesModalProps {
@@ -48,10 +52,12 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
 
   const loadConversations = () => {
     const allMessages = JSON.parse(localStorage.getItem('gta_messages') || '[]');
+    const userCommunities = JSON.parse(localStorage.getItem('user_communities') || '[]');
     const userConversations = new Map<string, Conversation>();
 
+    // Load individual messages
     allMessages.forEach((message: Message) => {
-      if (message.senderId === currentUser.id || message.receiverId === currentUser.id) {
+      if (message.type !== 'community' && (message.senderId === currentUser.id || message.receiverId === currentUser.id)) {
         const otherUserId = message.senderId === currentUser.id ? message.receiverId : message.senderId;
         const otherUserName = message.senderId === currentUser.id ? message.receiverName : message.senderName;
         const conversationId = [currentUser.id, otherUserId].sort().join('-');
@@ -63,7 +69,8 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
             participantNames: [currentUser.fullName, otherUserName],
             lastMessage: message.content,
             lastMessageTime: message.timestamp,
-            unreadCount: 0
+            unreadCount: 0,
+            type: 'individual'
           });
         }
 
@@ -75,6 +82,32 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
 
         if (!message.read && message.receiverId === currentUser.id) {
           conversation.unreadCount++;
+        }
+      }
+    });
+
+    // Load community conversations
+    userCommunities.forEach((community: any) => {
+      if (community.members.includes(currentUser.id)) {
+        const communityMessages = allMessages.filter((m: Message) => 
+          m.type === 'community' && m.conversationId === community.id
+        );
+        
+        const lastMessage = communityMessages.sort((a: Message, b: Message) => 
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        )[0];
+
+        if (lastMessage || communityMessages.length === 0) {
+          userConversations.set(community.id, {
+            id: community.id,
+            participants: community.members,
+            participantNames: [community.name],
+            lastMessage: lastMessage?.content || 'No messages yet',
+            lastMessageTime: lastMessage?.timestamp || new Date().toISOString(),
+            unreadCount: communityMessages.filter((m: Message) => !m.read && m.senderId !== currentUser.id).length,
+            type: 'community',
+            communityName: community.name
+          });
         }
       }
     });
@@ -137,6 +170,13 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
   const getTotalUnreadCount = () => {
     return conversations.reduce((total, conv) => total + conv.unreadCount, 0);
   };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const individualConversations = conversations.filter(c => c.type === 'individual');
+  const communityConversations = conversations.filter(c => c.type === 'community');
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
