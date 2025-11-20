@@ -1,4 +1,4 @@
-import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, Moon, Sun, MessageCircle } from 'lucide-react';
+import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, Moon, Sun, MessageCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,12 +7,16 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import SignInModal from './SignInModal';
 import MessagesModal from './MessagesModal';
+import AddSkillModal from './AddSkillModal';
+import AddActivityModal from './AddActivityModal';
 
 const Home = () => {
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showMessagesModal, setShowMessagesModal] = useState(false);
+  const [showAddSkillModal, setShowAddSkillModal] = useState(false);
+  const [showAddActivityModal, setShowAddActivityModal] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
@@ -446,14 +450,29 @@ const Home = () => {
       <section id="activities-section" className="py-12 px-4">
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-3xl font-bold">Activity and Events</h3>
-            <Button 
-              variant="ghost" 
-              className="text-primary hover:bg-primary/10"
-              onClick={handleExploreAll}
-            >
-              Explore All →
-            </Button>
+            <div>
+              <h3 className="text-3xl font-bold">Activity and Events</h3>
+            </div>
+            <div className="flex gap-2">
+              {user && (
+                <Button 
+                  onClick={() => setShowAddActivityModal(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden md:inline">Add Activity</span>
+                  <span className="md:hidden">Add</span>
+                </Button>
+              )}
+              <Button 
+                variant="ghost" 
+                className="text-primary hover:bg-primary/10"
+                onClick={handleExploreAll}
+              >
+                <span className="hidden md:inline">Explore All →</span>
+                <span className="md:hidden">All →</span>
+              </Button>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -520,6 +539,20 @@ const Home = () => {
       <MessagesModal 
         isOpen={showMessagesModal}
         onClose={() => setShowMessagesModal(false)}
+        currentUser={user}
+      />
+
+      {/* Add Skill Modal */}
+      <AddSkillModal 
+        isOpen={showAddSkillModal}
+        onClose={() => setShowAddSkillModal(false)}
+        currentUser={user}
+      />
+
+      {/* Add Activity Modal */}
+      <AddActivityModal 
+        isOpen={showAddActivityModal}
+        onClose={() => setShowAddActivityModal(false)}
         currentUser={user}
       />
     </div>
