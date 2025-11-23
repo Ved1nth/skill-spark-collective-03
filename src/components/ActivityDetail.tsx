@@ -86,7 +86,6 @@ const ActivityDetail = () => {
             location: 'Blue Ridge Trail',
             owner: {
               name: 'Priya Menon',
-              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
               title: 'Hiking Instructor',
               experience: '3 years',
               branch: 'Mechanical Engineering',
@@ -106,7 +105,6 @@ const ActivityDetail = () => {
             location: 'Mountain Peak Trail',
             owner: {
               name: 'Rajesh Kumar',
-              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
               title: 'Mountain Guide',
               experience: '4 years',
               branch: 'Civil Engineering',
@@ -126,7 +124,6 @@ const ActivityDetail = () => {
             location: 'Scenic Valley',
             owner: {
               name: 'Ananya Sharma',
-              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
               title: 'Professional Photographer',
               experience: '2 years',
               branch: 'Information Science',
@@ -146,7 +143,6 @@ const ActivityDetail = () => {
             location: 'Gentle Meadow Trail',
             owner: {
               name: 'Deepika Reddy',
-              avatar: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=100&h=100&fit=crop&crop=face',
               title: 'Family Coordinator',
               experience: '2 years',
               branch: 'Biotechnology',
@@ -170,7 +166,6 @@ const ActivityDetail = () => {
             location: 'Tech Hub Conference Room A',
             owner: {
               name: 'Arjun Patel',
-              avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
               title: 'Senior Frontend Developer',
               experience: '3 years',
               branch: 'Computer Science',
@@ -190,7 +185,6 @@ const ActivityDetail = () => {
             location: 'University Lab 201',
             owner: {
               name: 'Divya Krishnan',
-              avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face',
               title: 'AI/ML Researcher',
               experience: '2 years',
               branch: 'Computer Science',
@@ -210,7 +204,6 @@ const ActivityDetail = () => {
             location: 'Innovation Center',
             owner: {
               name: 'Karthik Iyer',
-              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
               title: 'Startup Founder',
               experience: '1 year',
               branch: 'Information Science',
@@ -230,7 +223,6 @@ const ActivityDetail = () => {
             location: 'Tech Cafe',
             owner: {
               name: 'Meera Nair',
-              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
               title: 'Mobile Developer',
               experience: '2 years',
               branch: 'Information Science',
@@ -250,7 +242,6 @@ const ActivityDetail = () => {
             location: 'Online (Zoom)',
             owner: {
               name: 'Rohan Desai',
-              avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
               title: 'DevOps Engineer',
               experience: '2 years',
               branch: 'Computer Science',
@@ -270,7 +261,6 @@ const ActivityDetail = () => {
             location: 'Security Lab',
             owner: {
               name: 'Sneha Reddy',
-              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
               title: 'Security Researcher',
               experience: '2 years',
               branch: 'Computer Science',
@@ -294,7 +284,6 @@ const ActivityDetail = () => {
             location: 'Library Study Room 3',
             owner: {
               name: 'Aditya Rao',
-              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
               title: 'Mathematics Tutor',
               experience: '1 year',
               branch: 'Mathematics',
@@ -314,7 +303,6 @@ const ActivityDetail = () => {
             location: 'Chemistry Building 205',
             owner: {
               name: 'Shruti Kulkarni',
-              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9fc8aa4?w=100&h=100&fit=crop&crop=face',
               title: 'Chemistry Lab Assistant',
               experience: '2 years',
               branch: 'Biotechnology',
@@ -334,7 +322,6 @@ const ActivityDetail = () => {
             location: 'Business School 101',
             owner: {
               name: 'Vikram Singh',
-              avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
               title: 'Business Student',
               experience: '1 year',
               branch: 'MBA',
@@ -354,7 +341,6 @@ const ActivityDetail = () => {
             location: 'Psychology Lab',
             owner: {
               name: 'Kavya Menon',
-              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
               title: 'Psychology Researcher',
               experience: '2 years',
               branch: 'Psychology',
@@ -555,7 +541,6 @@ Description: ${group.description}
                       {/* Owner Info */}
                       <div className="flex items-center space-x-3 mb-4">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={group.owner.avatar} alt={group.owner.name} />
                           <AvatarFallback>{group.owner.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
