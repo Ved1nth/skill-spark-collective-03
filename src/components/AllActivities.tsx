@@ -4,12 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const AllActivities = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [userActivities, setUserActivities] = useState<any[]>([]);
+
+  // Load user-generated activities from localStorage
+  useEffect(() => {
+    const savedActivities = localStorage.getItem('user_activities');
+    if (savedActivities) {
+      setUserActivities(JSON.parse(savedActivities));
+    }
+  }, []);
 
   // Comprehensive activities and events list
   const allActivities = [
@@ -202,10 +211,25 @@ const AllActivities = () => {
     },
   ];
 
-  const categories = ['All', ...Array.from(new Set(allActivities.map(activity => activity.category)))];
+  // Merge user-generated activities with base activities
+  const convertedUserActivities = userActivities.map((activity, index) => ({
+    id: `user-${activity.id || index}`,
+    title: activity.name,
+    description: activity.description,
+    participants: 1,
+    upcomingEvents: 1,
+    nextEvent: activity.date || 'TBD',
+    category: activity.category || 'User Activities',
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=300&fit=crop',
+    icon: Calendar
+  }));
+
+  const allActivitiesWithUser = [...allActivities, ...convertedUserActivities];
+
+  const categories = ['All', ...Array.from(new Set(allActivitiesWithUser.map(activity => activity.category)))];
 
   // Filter activities based on search term and category
-  const filteredActivities = allActivities.filter(activity => {
+  const filteredActivities = allActivitiesWithUser.filter(activity => {
     const matchesSearch = activity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          activity.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          activity.category.toLowerCase().includes(searchTerm.toLowerCase());

@@ -4,11 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const AllSkills = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [userSkills, setUserSkills] = useState<any[]>([]);
+
+  // Load user-generated skills from localStorage
+  useEffect(() => {
+    const savedSkills = localStorage.getItem('user_skills');
+    if (savedSkills) {
+      setUserSkills(JSON.parse(savedSkills));
+    }
+  }, []);
 
   // Comprehensive skills list with Fiverr-like services
   const allSkills = [
@@ -55,8 +64,20 @@ const AllSkills = () => {
     { id: 'project-management', name: 'Project Management', icon: Briefcase, count: 68, color: 'bg-blue-100 text-blue-600', category: 'Business' },
   ];
 
+  // Merge user-generated skills with base skills
+  const convertedUserSkills = userSkills.map((skill, index) => ({
+    id: `user-${skill.id || index}`,
+    name: skill.name,
+    icon: Code,
+    count: 1,
+    color: 'bg-green-100 text-green-600',
+    category: skill.category || 'User Skills'
+  }));
+
+  const allSkillsWithUser = [...allSkills, ...convertedUserSkills];
+
   // Filter skills based on search term
-  const filteredSkills = allSkills.filter(skill =>
+  const filteredSkills = allSkillsWithUser.filter(skill =>
     skill.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     skill.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
