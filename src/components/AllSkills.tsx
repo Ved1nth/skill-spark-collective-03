@@ -67,7 +67,7 @@ const AllSkills = () => {
   // Merge user-generated skills with base skills
   const convertedUserSkills = userSkills.map((skill, index) => ({
     id: `user-${skill.id || index}`,
-    name: skill.name,
+    name: skill.name || 'Untitled Skill',
     icon: Code,
     count: 1,
     color: 'bg-green-100 text-green-600',
@@ -78,8 +78,8 @@ const AllSkills = () => {
 
   // Filter skills based on search term
   const filteredSkills = allSkillsWithUser.filter(skill =>
-    skill.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    skill.category.toLowerCase().includes(searchTerm.toLowerCase())
+    (skill.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (skill.category || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Group skills by category

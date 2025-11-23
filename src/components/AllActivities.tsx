@@ -214,8 +214,8 @@ const AllActivities = () => {
   // Merge user-generated activities with base activities
   const convertedUserActivities = userActivities.map((activity, index) => ({
     id: `user-${activity.id || index}`,
-    title: activity.name,
-    description: activity.description,
+    title: activity.name || 'Untitled Activity',
+    description: activity.description || 'No description available',
     participants: 1,
     upcomingEvents: 1,
     nextEvent: activity.date || 'TBD',
@@ -230,9 +230,9 @@ const AllActivities = () => {
 
   // Filter activities based on search term and category
   const filteredActivities = allActivitiesWithUser.filter(activity => {
-    const matchesSearch = activity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         activity.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         activity.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (activity.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (activity.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (activity.category || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || activity.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
