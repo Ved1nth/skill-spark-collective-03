@@ -5,64 +5,71 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AddActivityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUser: any;
+  onActivityAdded?: () => void;
 }
 
-const AddActivityModal = ({ isOpen, onClose, currentUser }: AddActivityModalProps) => {
+const AddActivityModal = ({ isOpen, onClose, onActivityAdded }: AddActivityModalProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     category: '',
     date: '',
     time: '',
-    location: '',
+    venue: '',
     maxParticipants: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!currentUser) {
-      toast.error('Please sign in to add an activity');
-      return;
+    setIsLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error('Please sign in to add an activity');
+        setIsLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.from('activities').insert({
+        user_id: user.id,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        date: formData.date,
+        time: formData.time,
+        venue: formData.venue,
+        max_participants: parseInt(formData.maxParticipants) || null
+      });
+
+      if (error) {
+        toast.error('Failed to add activity: ' + error.message);
+      } else {
+        toast.success('Activity added successfully!');
+        setFormData({
+          title: '',
+          description: '',
+          category: '',
+          date: '',
+          time: '',
+          venue: '',
+          maxParticipants: ''
+        });
+        onActivityAdded?.();
+        onClose();
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
-
-    const newActivity = {
-      id: `user-activity-${Date.now()}`,
-      ...formData,
-      participants: 1,
-      upcomingEvents: 1,
-      nextEvent: formData.date,
-      organizer: {
-        id: currentUser.id,
-        name: currentUser.fullName,
-        branch: currentUser.branch || 'Student',
-        year: currentUser.year || '3rd Year'
-      },
-      createdAt: new Date().toISOString()
-    };
-
-    // Save to localStorage
-    const existingActivities = JSON.parse(localStorage.getItem('user_activities') || '[]');
-    existingActivities.push(newActivity);
-    localStorage.setItem('user_activities', JSON.stringify(existingActivities));
-
-    toast.success('Activity added successfully!');
-    setFormData({
-      title: '',
-      description: '',
-      category: '',
-      date: '',
-      time: '',
-      location: '',
-      maxParticipants: ''
-    });
-    onClose();
-    window.location.reload(); // Reload to show new activity
   };
 
   if (!isOpen) return null;
@@ -103,13 +110,22 @@ const AddActivityModal = ({ isOpen, onClose, currentUser }: AddActivityModalProp
 
           <div>
             <Label htmlFor="category">Category *</Label>
-            <Input
+            <select
               id="category"
               required
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              placeholder="e.g., Technology, Sports, Academic, Social"
-            />
+              className="w-full px-3 py-2 border rounded-md bg-background text-foreground border-border"
+            >
+              <option value="">Select a category</option>
+              <option value="Academic">Academic</option>
+              <option value="Sports">Sports</option>
+              <option value="Technology">Technology</option>
+              <option value="Arts & Culture">Arts & Culture</option>
+              <option value="Social">Social</option>
+              <option value="Career">Career</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -137,12 +153,12 @@ const AddActivityModal = ({ isOpen, onClose, currentUser }: AddActivityModalProp
           </div>
 
           <div>
-            <Label htmlFor="location">Location *</Label>
+            <Label htmlFor="venue">Venue *</Label>
             <Input
-              id="location"
+              id="venue"
               required
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              value={formData.venue}
+              onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
               placeholder="e.g., Main Campus, Lab 301, Online"
             />
           </div>
@@ -163,8 +179,8 @@ const AddActivityModal = ({ isOpen, onClose, currentUser }: AddActivityModalProp
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" className="flex-1">
-              Add Activity
+            <Button type="submit" className="flex-1" disabled={isLoading}>
+              {isLoading ? 'Adding...' : 'Add Activity'}
             </Button>
           </div>
         </form>

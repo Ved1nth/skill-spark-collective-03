@@ -14,7 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          category: string
+          created_at: string
+          date: string | null
+          description: string | null
+          id: string
+          max_participants: number | null
+          requirements: string | null
+          time: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          venue: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          id?: string
+          max_participants?: number | null
+          requirements?: string | null
+          time?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          venue?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          id?: string
+          max_participants?: number | null
+          requirements?: string | null
+          time?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          academic_year: string | null
+          created_at: string
+          department: string | null
+          email: string
+          full_name: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          academic_year?: string | null
+          created_at?: string
+          department?: string | null
+          email: string
+          full_name: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          academic_year?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          availability: string | null
+          category: string
+          created_at: string
+          description: string | null
+          experience: string | null
+          hourly_rate: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          availability?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          experience?: string | null
+          hourly_rate?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          availability?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          experience?: string | null
+          hourly_rate?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

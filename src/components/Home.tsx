@@ -5,21 +5,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import SignInModal from './SignInModal';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 import MessagesModal from './MessagesModal';
 import AddSkillModal from './AddSkillModal';
 import AddActivityModal from './AddActivityModal';
+import { toast } from 'sonner';
 
 const Home = () => {
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showSignInModal, setShowSignInModal] = useState(false);
   const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [showAddSkillModal, setShowAddSkillModal] = useState(false);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dbSkills, setDbSkills] = useState<any[]>([]);
+  const [dbActivities, setDbActivities] = useState<any[]>([]);
   
   const skills = [
     { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
@@ -59,6 +64,65 @@ const Home = () => {
     },
   ];
 
+  // Auth state management
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        setTimeout(() => {
+          fetchProfile(session.user.id);
+        }, 0);
+      } else {
+        setProfile(null);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+    setProfile(data);
+  };
+
+  // Fetch skills and activities from database
+  useEffect(() => {
+    fetchDbSkills();
+    fetchDbActivities();
+  }, []);
+
+  const fetchDbSkills = async () => {
+    const { data } = await supabase
+      .from('skills')
+      .select('*, profiles(full_name)')
+      .order('created_at', { ascending: false })
+      .limit(8);
+    if (data) setDbSkills(data);
+  };
+
+  const fetchDbActivities = async () => {
+    const { data } = await supabase
+      .from('activities')
+      .select('*, profiles(full_name)')
+      .order('created_at', { ascending: false })
+      .limit(6);
+    if (data) setDbActivities(data);
+  };
+
   const scrollToSkills = () => {
     const skillsSection = document.getElementById('skills-section');
     skillsSection?.scrollIntoView({ behavior: 'smooth' });
@@ -70,59 +134,48 @@ const Home = () => {
   };
 
   const handleSignIn = () => {
-    console.log('Sign In clicked - opening sign-in modal');
-    setShowSignInModal(true);
+    navigate('/auth');
   };
 
-  const handleSignOut = () => {
-    localStorage.removeItem('gta_user');
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    console.log('User signed out');
-  };
-
-  const handleUserSignIn = (userData: any) => {
-    setUser(userData);
-    console.log('User signed in:', userData);
+    setSession(null);
+    setProfile(null);
+    toast.success('Signed out successfully');
   };
 
   const handleGetStarted = () => {
-    console.log('Get Started clicked - opening sign-in modal');
-    setShowSignInModal(true);
+    navigate('/auth');
   };
 
   const handleFindTalent = () => {
-    console.log('Find Talent clicked - scrolling to skills');
     scrollToSkills();
   };
 
   const handleBrowseActivities = () => {
-    console.log('Browse Activities clicked - scrolling to activities');
     scrollToActivities();
   };
 
   const handleSkillClick = (skillId: string) => {
-    console.log('Skill clicked:', skillId);
     navigate(`/skill/${skillId}`);
   };
 
   const handleActivityClick = (activityId: string) => {
-    console.log('Activity clicked:', activityId);
     navigate(`/activity/${activityId}`);
   };
 
   const handleViewAllSkills = () => {
-    console.log('View All Skills clicked');
     navigate('/skills');
   };
 
   const handleExploreAll = () => {
-    console.log('Explore All clicked');
     navigate('/activities');
   };
 
   const handleStartConnecting = () => {
     if (!user) {
-      setShowSignInModal(true);
+      navigate('/auth');
     }
   };
 
@@ -130,7 +183,6 @@ const Home = () => {
     if (e.key === 'Enter' && searchTerm.trim()) {
       const lowerSearch = searchTerm.toLowerCase();
       
-      // Search in skills
       const skillMatch = skills.find(skill => 
         skill.name.toLowerCase().includes(lowerSearch)
       );
@@ -140,7 +192,6 @@ const Home = () => {
         return;
       }
       
-      // Search in activities
       const activityMatch = activities.find(activity => 
         activity.title.toLowerCase().includes(lowerSearch)
       );
@@ -150,7 +201,6 @@ const Home = () => {
         return;
       }
       
-      // If no exact match, go to all skills page
       navigate('/skills');
       setSearchTerm('');
     }
@@ -165,7 +215,6 @@ const Home = () => {
     }
   };
 
-  // Apply theme on component mount and when isDarkMode changes
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -174,31 +223,7 @@ const Home = () => {
     }
   }, [isDarkMode]);
 
-  // Check for existing user on component mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem('gta_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
-
-  // Update unread message count
-  useEffect(() => {
-    if (user) {
-      const updateUnreadCount = () => {
-        const allMessages = JSON.parse(localStorage.getItem('gta_messages') || '[]');
-        const unread = allMessages.filter((message: any) => 
-          message.receiverId === user.id && !message.read
-        ).length;
-        setUnreadCount(unread);
-      };
-
-      updateUnreadCount();
-      // Check for new messages every 5 seconds
-      const interval = setInterval(updateUnreadCount, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [user]);
+  const userName = profile?.full_name || user?.user_metadata?.full_name || 'User';
 
   return (
     <div className="min-h-screen bg-gradient-soft">
@@ -213,7 +238,6 @@ const Home = () => {
               </h1>
             </div>
             
-            {/* Search Bar - Hidden on mobile, visible on desktop */}
             <div className="hidden md:flex flex-1 max-w-md mx-8">
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -235,11 +259,7 @@ const Home = () => {
                 className="text-muted-foreground hover:text-primary p-2"
                 aria-label="Toggle theme"
               >
-                {isDarkMode ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
+                {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
               
               {user ? (
@@ -263,7 +283,7 @@ const Home = () => {
                   </Button>
                   <div className="hidden md:block text-sm">
                     <span className="text-muted-foreground">Welcome, </span>
-                    <span className="font-medium">{user.fullName.split(' ')[0]}</span>
+                    <span className="font-medium">{userName.split(' ')[0]}</span>
                   </div>
                   <Button 
                     variant="ghost" 
@@ -299,7 +319,6 @@ const Home = () => {
             </div>
           </div>
           
-          {/* Mobile Search Bar */}
           <div className="md:hidden mt-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -317,9 +336,7 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="py-8 md:py-16 px-4 relative overflow-hidden">
-        {/* Animated Background Graphics - Simplified for mobile */}
         <div className="absolute inset-0 pointer-events-none">
-          {/* Floating Skill Icons - Fewer on mobile */}
           <div className="hidden md:block absolute top-20 left-10 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center animate-float-slow">
             <Code className="h-6 w-6 text-primary/60" />
           </div>
@@ -339,7 +356,6 @@ const Home = () => {
             <Mic className="h-4 w-4 text-yellow-500" />
           </div>
 
-          {/* Connection Lines - Simplified for mobile */}
           <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -348,7 +364,6 @@ const Home = () => {
               </linearGradient>
             </defs>
             
-            {/* Animated connection lines - Hidden on mobile for performance */}
             <path
               d="M100,80 Q200,120 300,100 T500,90"
               stroke="url(#connectionGradient)"
@@ -365,12 +380,10 @@ const Home = () => {
             />
           </svg>
 
-          {/* Floating Particles - Reduced for mobile */}
           <div className="hidden md:block absolute top-24 left-1/4 w-2 h-2 bg-primary/40 rounded-full animate-pulse-float"></div>
           <div className="absolute bottom-16 md:bottom-32 right-1/4 md:right-1/3 w-1.5 h-1.5 bg-purple-400/50 rounded-full animate-pulse-float-delayed"></div>
           <div className="hidden md:block absolute top-48 right-1/4 w-3 h-3 bg-green-400/30 rounded-full animate-pulse-float-reverse"></div>
 
-          {/* Gradient Orbs - Smaller on mobile */}
           <div className="absolute top-8 md:top-16 right-4 md:right-12 w-16 md:w-32 h-16 md:h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full blur-xl animate-blob"></div>
           <div className="absolute bottom-8 md:bottom-20 left-4 md:left-16 w-20 md:w-40 h-20 md:h-40 bg-gradient-to-br from-purple-400/15 to-pink-400/10 rounded-full blur-2xl animate-blob-delayed"></div>
         </div>
@@ -410,28 +423,39 @@ const Home = () => {
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 space-y-2 sm:space-y-0">
             <h3 className="text-2xl md:text-3xl font-bold">Skills and Service</h3>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="text-primary hover:bg-primary/10 self-start sm:self-auto"
-              onClick={handleViewAllSkills}
-            >
-              <span className="hidden sm:inline">View All Skills →</span>
-              <span className="sm:hidden">View All →</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              {user && (
+                <Button 
+                  size="sm"
+                  className="gradient-electric text-primary-foreground"
+                  onClick={() => setShowAddSkillModal(true)}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Your Skill
+                </Button>
+              )}
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-primary hover:bg-primary/10"
+                onClick={handleViewAllSkills}
+              >
+                View All →
+              </Button>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {skills.map((skill, index) => {
+            {skills.slice(0, 8).map((skill) => {
               const IconComponent = skill.icon;
               return (
                 <Card 
                   key={skill.id} 
-                  className="group hover:shadow-lg transition-smooth cursor-pointer border-border/50 hover:border-primary/20 active:scale-95"
+                  className="group hover:shadow-lg transition-smooth cursor-pointer border-border/50 hover:border-primary/20"
                   onClick={() => handleSkillClick(skill.id)}
                 >
-                  <CardHeader className="pb-3 p-4 md:p-6">
-                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg ${skill.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-smooth`}>
+                  <CardHeader className="pb-2 md:pb-3">
+                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg ${skill.color} flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-smooth`}>
                       <IconComponent className="h-5 w-5 md:h-6 md:w-6" />
                     </div>
                     <CardTitle className="text-base md:text-lg">{skill.name}</CardTitle>
@@ -443,79 +467,143 @@ const Home = () => {
               );
             })}
           </div>
+
+          {/* User-added skills from database */}
+          {dbSkills.length > 0 && (
+            <div className="mt-8">
+              <h4 className="text-xl font-semibold mb-4">Recently Added by Students</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {dbSkills.slice(0, 4).map((skill) => (
+                  <Card 
+                    key={skill.id} 
+                    className="group hover:shadow-lg transition-smooth cursor-pointer border-border/50 hover:border-primary/20"
+                  >
+                    <CardHeader className="pb-2 md:pb-3">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 md:mb-3">
+                        <Code className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                      </div>
+                      <CardTitle className="text-base md:text-lg">{skill.title}</CardTitle>
+                      <CardDescription className="text-sm line-clamp-2">
+                        {skill.description}
+                      </CardDescription>
+                      <Badge variant="secondary" className="w-fit mt-2">
+                        {skill.category}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        by {skill.profiles?.full_name || 'Anonymous'}
+                      </p>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Activities Section */}
-      <section id="activities-section" className="py-12 px-4">
+      <section id="activities-section" className="py-8 md:py-12 px-4">
         <div className="container mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="text-3xl font-bold">Activity and Events</h3>
-            </div>
-            <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 space-y-2 sm:space-y-0">
+            <h3 className="text-2xl md:text-3xl font-bold">Activity and Events</h3>
+            <div className="flex items-center gap-2">
               {user && (
                 <Button 
+                  size="sm"
+                  className="gradient-electric text-primary-foreground"
                   onClick={() => setShowAddActivityModal(true)}
-                  className="flex items-center gap-2"
                 >
-                  <Plus className="h-4 w-4" />
-                  <span className="hidden md:inline">Add Activity</span>
-                  <span className="md:hidden">Add</span>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Activity
                 </Button>
               )}
               <Button 
                 variant="ghost" 
+                size="sm"
                 className="text-primary hover:bg-primary/10"
                 onClick={handleExploreAll}
               >
-                <span className="hidden md:inline">Explore All →</span>
-                <span className="md:hidden">All →</span>
+                Explore All →
               </Button>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activities.map((activity, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {activities.map((activity) => (
               <Card 
-                key={activity.id}
+                key={activity.id} 
                 className="group hover:shadow-lg transition-smooth cursor-pointer overflow-hidden border-border/50 hover:border-primary/20"
                 onClick={() => handleActivityClick(activity.id)}
               >
-                <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 relative overflow-hidden">
+                <div className="aspect-video overflow-hidden">
                   <img 
                     src={activity.image} 
                     alt={activity.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-smooth"
                   />
-                  <div className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm px-2 py-1 rounded-full text-sm font-medium">
-                    {activity.participants} members
-                  </div>
                 </div>
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    {activity.title}
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                      {activity.nextEvent}
-                    </span>
-                  </CardTitle>
-                  <CardDescription>
-                    {activity.description}
-                  </CardDescription>
+                  <CardTitle className="text-lg md:text-xl">{activity.title}</CardTitle>
+                  <CardDescription className="text-sm">{activity.description}</CardDescription>
                 </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex items-center justify-between text-xs md:text-sm">
+                    <span className="flex items-center text-muted-foreground">
+                      <Users className="h-3 w-3 md:h-4 md:w-4 mr-1" />
+                      {activity.participants} joined
+                    </span>
+                    <Badge variant="secondary" className="text-xs">
+                      {activity.nextEvent}
+                    </Badge>
+                  </div>
+                </CardContent>
               </Card>
             ))}
           </div>
+
+          {/* User-added activities from database */}
+          {dbActivities.length > 0 && (
+            <div className="mt-8">
+              <h4 className="text-xl font-semibold mb-4">Recently Added Events</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {dbActivities.slice(0, 3).map((activity) => (
+                  <Card 
+                    key={activity.id} 
+                    className="group hover:shadow-lg transition-smooth cursor-pointer border-border/50 hover:border-primary/20"
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-lg">{activity.title}</CardTitle>
+                      <CardDescription className="line-clamp-2">{activity.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-2 text-sm">
+                        <Badge variant="secondary">{activity.category}</Badge>
+                        <p className="text-muted-foreground">
+                          📅 {activity.date} at {activity.time}
+                        </p>
+                        <p className="text-muted-foreground">
+                          📍 {activity.venue}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Organized by {activity.profiles?.full_name || 'Anonymous'}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* CTA Section - Only show when user is not signed in */}
+      {/* CTA Section */}
       {!user && (
-        <section className="py-16 px-4 bg-gradient-to-r from-primary/5 to-primary/10">
+        <section className="py-12 md:py-16 px-4 bg-background/50">
           <div className="container mx-auto text-center">
-            <h3 className="text-3xl font-bold mb-4">Ready to Make Connections?</h3>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              Join thousands of students already connecting through shared passions and skills.
+            <h3 className="text-2xl md:text-3xl font-bold mb-4">Ready to Connect?</h3>
+            <p className="text-muted-foreground mb-6 md:mb-8 max-w-xl mx-auto">
+              Join thousands of students who are already building meaningful connections through shared skills and interests.
             </p>
             <Button 
               size="lg" 
@@ -528,32 +616,23 @@ const Home = () => {
         </section>
       )}
 
-      {/* Sign In Modal */}
-      <SignInModal 
-        isOpen={showSignInModal}
-        onClose={() => setShowSignInModal(false)}
-        onSignIn={handleUserSignIn}
-      />
-
-      {/* Messages Modal */}
+      {/* Modals */}
       <MessagesModal 
-        isOpen={showMessagesModal}
+        isOpen={showMessagesModal} 
         onClose={() => setShowMessagesModal(false)}
-        currentUser={user}
+        currentUser={user ? { id: user.id, fullName: userName } : null}
       />
-
-      {/* Add Skill Modal */}
+      
       <AddSkillModal 
-        isOpen={showAddSkillModal}
+        isOpen={showAddSkillModal} 
         onClose={() => setShowAddSkillModal(false)}
-        currentUser={user}
+        onSkillAdded={fetchDbSkills}
       />
-
-      {/* Add Activity Modal */}
+      
       <AddActivityModal 
-        isOpen={showAddActivityModal}
+        isOpen={showAddActivityModal} 
         onClose={() => setShowAddActivityModal(false)}
-        currentUser={user}
+        onActivityAdded={fetchDbActivities}
       />
     </div>
   );
