@@ -5,14 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AddSkillModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUser: any;
+  onSkillAdded?: () => void;
 }
 
-const AddSkillModal = ({ isOpen, onClose, currentUser }: AddSkillModalProps) => {
+const AddSkillModal = ({ isOpen, onClose, onSkillAdded }: AddSkillModalProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -22,44 +24,49 @@ const AddSkillModal = ({ isOpen, onClose, currentUser }: AddSkillModalProps) => 
     availability: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!currentUser) {
-      toast.error('Please sign in to add a skill');
-      return;
+    setIsLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error('Please sign in to add a skill');
+        setIsLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.from('skills').insert({
+        user_id: user.id,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        experience: formData.experience,
+        hourly_rate: formData.hourlyRate,
+        availability: formData.availability
+      });
+
+      if (error) {
+        toast.error('Failed to add skill: ' + error.message);
+      } else {
+        toast.success('Skill added successfully!');
+        setFormData({
+          title: '',
+          description: '',
+          category: '',
+          experience: '',
+          hourlyRate: '',
+          availability: ''
+        });
+        onSkillAdded?.();
+        onClose();
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
-
-    const newSkill = {
-      id: `user-skill-${Date.now()}`,
-      ...formData,
-      provider: {
-        id: currentUser.id,
-        name: currentUser.fullName,
-        branch: currentUser.branch || 'Student',
-        year: currentUser.year || '3rd Year'
-      },
-      rating: 0,
-      reviews: 0,
-      createdAt: new Date().toISOString()
-    };
-
-    // Save to localStorage
-    const existingSkills = JSON.parse(localStorage.getItem('user_skills') || '[]');
-    existingSkills.push(newSkill);
-    localStorage.setItem('user_skills', JSON.stringify(existingSkills));
-
-    toast.success('Skill added successfully!');
-    setFormData({
-      title: '',
-      description: '',
-      category: '',
-      experience: '',
-      hourlyRate: '',
-      availability: ''
-    });
-    onClose();
-    window.location.reload(); // Reload to show new skill
   };
 
   if (!isOpen) return null;
@@ -100,24 +107,39 @@ const AddSkillModal = ({ isOpen, onClose, currentUser }: AddSkillModalProps) => 
 
           <div>
             <Label htmlFor="category">Category *</Label>
-            <Input
+            <select
               id="category"
               required
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              placeholder="e.g., Technology, Design, Academic"
-            />
+              className="w-full px-3 py-2 border rounded-md bg-background text-foreground border-border"
+            >
+              <option value="">Select a category</option>
+              <option value="Programming & Tech">Programming & Tech</option>
+              <option value="Graphics & Design">Graphics & Design</option>
+              <option value="Writing & Translation">Writing & Translation</option>
+              <option value="Video & Animation">Video & Animation</option>
+              <option value="Music & Audio">Music & Audio</option>
+              <option value="Digital Marketing">Digital Marketing</option>
+              <option value="Business">Business</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
           <div>
             <Label htmlFor="experience">Experience Level *</Label>
-            <Input
+            <select
               id="experience"
               required
               value={formData.experience}
               onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-              placeholder="e.g., 2 years, Beginner, Expert"
-            />
+              className="w-full px-3 py-2 border rounded-md bg-background text-foreground border-border"
+            >
+              <option value="">Select experience level</option>
+              <option value="Beginner">Beginner (Less than 1 year)</option>
+              <option value="Intermediate">Intermediate (1-3 years)</option>
+              <option value="Expert">Expert (3+ years)</option>
+            </select>
           </div>
 
           <div>
@@ -134,21 +156,27 @@ const AddSkillModal = ({ isOpen, onClose, currentUser }: AddSkillModalProps) => 
 
           <div>
             <Label htmlFor="availability">Availability *</Label>
-            <Input
+            <select
               id="availability"
               required
               value={formData.availability}
               onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-              placeholder="e.g., Weekends, After 5 PM"
-            />
+              className="w-full px-3 py-2 border rounded-md bg-background text-foreground border-border"
+            >
+              <option value="">Select availability</option>
+              <option value="Weekdays">Weekdays</option>
+              <option value="Weekends">Weekends</option>
+              <option value="Evenings">Evenings (After 5 PM)</option>
+              <option value="Flexible">Flexible</option>
+            </select>
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" className="flex-1">
-              Add Skill
+            <Button type="submit" className="flex-1" disabled={isLoading}>
+              {isLoading ? 'Adding...' : 'Add Skill'}
             </Button>
           </div>
         </form>

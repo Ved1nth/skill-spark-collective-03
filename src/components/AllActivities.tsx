@@ -5,19 +5,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const AllActivities = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [userActivities, setUserActivities] = useState<any[]>([]);
+  const [dbActivities, setDbActivities] = useState<any[]>([]);
 
-  // Load user-generated activities from localStorage
+  // Load user-generated activities from database
   useEffect(() => {
-    const savedActivities = localStorage.getItem('user_activities');
-    if (savedActivities) {
-      setUserActivities(JSON.parse(savedActivities));
-    }
+    const fetchActivities = async () => {
+      const { data } = await supabase
+        .from('activities')
+        .select('*, profiles(full_name)')
+        .order('created_at', { ascending: false });
+      if (data) setDbActivities(data);
+    };
+    fetchActivities();
   }, []);
 
   // Comprehensive activities and events list
@@ -211,20 +216,24 @@ const AllActivities = () => {
     },
   ];
 
-  // Merge user-generated activities with base activities
-  const convertedUserActivities = userActivities.map((activity, index) => ({
-    id: `user-${activity.id || index}`,
-    title: activity.name || 'Untitled Activity',
+  // Convert database activities to display format
+  const convertedDbActivities = dbActivities.map((activity) => ({
+    id: `db-${activity.id}`,
+    title: activity.title || 'Untitled Activity',
     description: activity.description || 'No description available',
     participants: 1,
     upcomingEvents: 1,
     nextEvent: activity.date || 'TBD',
     category: activity.category || 'User Activities',
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=300&fit=crop',
-    icon: Calendar
+    icon: Calendar,
+    isUserActivity: true,
+    venue: activity.venue,
+    time: activity.time,
+    organizer: activity.profiles?.full_name || 'Anonymous'
   }));
 
-  const allActivitiesWithUser = [...allActivities, ...convertedUserActivities];
+  const allActivitiesWithUser = [...allActivities, ...convertedDbActivities];
 
   const categories = ['All', ...Array.from(new Set(allActivitiesWithUser.map(activity => activity.category)))];
 
@@ -244,10 +253,12 @@ const AllActivities = () => {
     }
     acc[activity.category].push(activity);
     return acc;
-  }, {} as Record<string, typeof allActivities>);
+  }, {} as Record<string, typeof allActivitiesWithUser>);
 
   const handleActivityClick = (activityId: string) => {
-    navigate(`/activity/${activityId}`);
+    if (!activityId.startsWith('db-')) {
+      navigate(`/activity/${activityId}`);
+    }
   };
 
   return (
@@ -322,12 +333,12 @@ const AllActivities = () => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activities.map((activity) => {
+                {activities.map((activity: any) => {
                   const IconComponent = activity.icon;
                   return (
                     <Card 
                       key={activity.id}
-                      className="group hover:shadow-lg transition-smooth cursor-pointer overflow-hidden border-border/50 hover:border-primary/20"
+                      className={`group hover:shadow-lg transition-smooth overflow-hidden border-border/50 hover:border-primary/20 ${!activity.isUserActivity ? 'cursor-pointer' : ''}`}
                       onClick={() => handleActivityClick(activity.id)}
                     >
                       <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 relative overflow-hidden">
@@ -355,16 +366,24 @@ const AllActivities = () => {
                         <CardDescription>
                           {activity.description}
                         </CardDescription>
-                        <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-2">
-                          <div className="flex items-center">
-                            <Users className="h-4 w-4 mr-1" />
-                            {activity.participants} members
+                        {activity.isUserActivity ? (
+                          <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                            {activity.venue && <p>📍 {activity.venue}</p>}
+                            {activity.time && <p>🕐 {activity.time}</p>}
+                            <p className="text-xs">Organized by {activity.organizer}</p>
                           </div>
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            {activity.upcomingEvents} events
+                        ) : (
+                          <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-2">
+                            <div className="flex items-center">
+                              <Users className="h-4 w-4 mr-1" />
+                              {activity.participants} members
+                            </div>
+                            <div className="flex items-center">
+                              <Calendar className="h-4 w-4 mr-1" />
+                              {activity.upcomingEvents} events
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </CardHeader>
                     </Card>
                   );
