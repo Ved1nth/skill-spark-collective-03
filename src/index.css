@@ -2,110 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Holographic Dreamscape Design System */
 
 @layer base {
   :root {
-    /* Clean, modern color palette inspired by Apple/Notion */
-    --background: 0 0% 100%;
-    --foreground: 220 9% 9%;
+    /* Deep atmospheric void base */
+    --background: 248 25% 6%;
+    --foreground: 220 20% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 9% 9%;
+    --card: 250 30% 10%;
+    --card-foreground: 220 20% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 9% 9%;
+    --popover: 250 30% 10%;
+    --popover-foreground: 220 20% 95%;
 
-    /* Electric blue primary - the spark that connects */
-    --primary: 217 91% 60%;
+    /* Electric plasma primary - living energy */
+    --primary: 280 85% 65%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 217 91% 95%;
+    --primary-soft: 280 60% 20%;
 
-    /* Subtle grays for secondary content */
-    --secondary: 220 13% 96%;
-    --secondary-foreground: 220 9% 46%;
+    /* Deep teal secondary */
+    --secondary: 185 70% 15%;
+    --secondary-foreground: 185 60% 80%;
 
-    --muted: 220 13% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 250 25% 15%;
+    --muted-foreground: 220 15% 55%;
 
-    --accent: 217 91% 95%;
-    --accent-foreground: 217 91% 60%;
+    /* Electric magenta accent */
+    --accent: 320 80% 55%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 60%;
+    --border: 250 30% 20%;
+    --input: 250 30% 15%;
+    --ring: 280 85% 65%;
 
-    /* Electric gradients for special effects */
-    --gradient-electric: linear-gradient(135deg, hsl(217 91% 60%), hsl(230 91% 70%));
-    --gradient-soft: linear-gradient(180deg, hsl(220 13% 98%), hsl(220 13% 96%));
+    /* Holographic gradients */
+    --gradient-nebula: linear-gradient(135deg, 
+      hsl(280 70% 20% / 0.8), 
+      hsl(185 60% 15% / 0.6), 
+      hsl(320 70% 25% / 0.7));
+    --gradient-aurora: linear-gradient(90deg,
+      hsl(280 80% 50% / 0.3),
+      hsl(185 70% 45% / 0.3),
+      hsl(320 75% 50% / 0.3),
+      hsl(280 80% 50% / 0.3));
+    --gradient-plasma: linear-gradient(135deg, 
+      hsl(280 85% 65%), 
+      hsl(320 80% 55%));
+    --gradient-crystal: linear-gradient(180deg,
+      hsl(250 30% 15% / 0.4),
+      hsl(250 30% 10% / 0.8));
+    --gradient-void: radial-gradient(ellipse at center,
+      hsl(280 40% 12%),
+      hsl(248 25% 6%));
+
+    /* Cinematic bloom shadows */
+    --shadow-glow: 0 0 60px hsl(280 85% 65% / 0.3), 0 0 120px hsl(320 80% 55% / 0.15);
+    --shadow-crystal: 0 8px 32px hsl(280 60% 30% / 0.3), 0 0 1px hsl(0 0% 100% / 0.1);
+    --shadow-plasma: 0 0 40px hsl(280 85% 65% / 0.5), 0 0 80px hsl(320 80% 55% / 0.3);
     
-    /* Elegant shadows */
-    --shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    --shadow-electric: 0 4px 20px -4px hsl(217 91% 60% / 0.3);
-    
-    /* Smooth transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Glass refraction */
+    --glass-refraction: hsl(280 60% 80% / 0.05);
 
-    --radius: 0.75rem;
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
+    --radius: 1rem;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 250 25% 8%;
+    --sidebar-foreground: 220 20% 95%;
+    --sidebar-primary: 280 85% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 320 80% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 250 30% 20%;
+    --sidebar-ring: 280 85% 65%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark mode uses same holographic palette */
+    --background: 248 25% 4%;
+    --foreground: 220 20% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 250 30% 8%;
+    --card-foreground: 220 20% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 250 30% 8%;
+    --popover-foreground: 220 20% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 280 85% 65%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 185 70% 15%;
+    --secondary-foreground: 185 60% 80%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 250 25% 12%;
+    --muted-foreground: 220 15% 55%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 320 80% 55%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 220 20% 95%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 250 30% 18%;
+    --input: 250 30% 12%;
+    --ring: 280 85% 65%;
+    
+    --sidebar-background: 250 25% 6%;
+    --sidebar-foreground: 220 20% 95%;
+    --sidebar-primary: 280 85% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 320 80% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 250 30% 18%;
+    --sidebar-ring: 280 85% 65%;
   }
 }
 
@@ -116,187 +129,334 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-sans;
+    background: var(--gradient-void);
+    min-height: 100vh;
   }
 }
 
 @layer components {
-  /* Electric Animations */
+  /* Kinetic Atmosphere - Nebula Background */
+  .nebula-atmosphere {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .nebula-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.6;
+    animation: nebulaFloat 20s ease-in-out infinite;
+  }
+
+  .nebula-orb-1 {
+    width: 40vw;
+    height: 40vw;
+    background: radial-gradient(circle, hsl(280 70% 40% / 0.6), transparent 70%);
+    top: -10%;
+    left: -10%;
+    animation-duration: 25s;
+  }
+
+  .nebula-orb-2 {
+    width: 35vw;
+    height: 35vw;
+    background: radial-gradient(circle, hsl(185 60% 35% / 0.5), transparent 70%);
+    bottom: -15%;
+    right: -5%;
+    animation-duration: 30s;
+    animation-delay: -5s;
+  }
+
+  .nebula-orb-3 {
+    width: 30vw;
+    height: 30vw;
+    background: radial-gradient(circle, hsl(320 70% 45% / 0.4), transparent 70%);
+    top: 50%;
+    left: 30%;
+    animation-duration: 22s;
+    animation-delay: -10s;
+  }
+
+  .nebula-orb-4 {
+    width: 25vw;
+    height: 25vw;
+    background: radial-gradient(circle, hsl(260 65% 50% / 0.35), transparent 70%);
+    top: 20%;
+    right: 20%;
+    animation-duration: 28s;
+    animation-delay: -15s;
+  }
+
+  /* Crystalline Cards */
+  .crystal-card {
+    background: linear-gradient(135deg, 
+      hsl(250 30% 15% / 0.4),
+      hsl(250 30% 10% / 0.6));
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid hsl(280 60% 50% / 0.15);
+    box-shadow: 
+      0 8px 32px hsl(280 60% 30% / 0.2),
+      inset 0 1px 0 hsl(0 0% 100% / 0.05),
+      0 0 0 1px hsl(0 0% 100% / 0.02);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crystal-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-aurora);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    animation: auroraShift 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .crystal-card:hover::before {
+    opacity: 1;
+  }
+
+  .crystal-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      from 0deg,
+      transparent,
+      hsl(280 80% 70% / 0.1) 10%,
+      transparent 20%
+    );
+    animation: causticRotate 15s linear infinite;
+    pointer-events: none;
+  }
+
+  /* Liquid Light Interactive Elements */
+  .plasma-button {
+    position: relative;
+    background: var(--gradient-plasma);
+    border: none;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-plasma);
+  }
+
+  .plasma-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+      hsl(0 0% 100% / 0.3) 0%, 
+      transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .plasma-button:hover::before {
+    opacity: 1;
+  }
+
+  .plasma-button::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: linear-gradient(135deg, 
+      hsl(0 0% 100% / 0.1),
+      transparent 50%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .plasma-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      var(--shadow-plasma),
+      0 20px 40px hsl(280 85% 65% / 0.3);
+  }
+
+  /* Cinematic Bloom */
+  .bloom-effect {
+    filter: blur(0);
+    position: relative;
+  }
+
+  .bloom-effect::after {
+    content: '';
+    position: absolute;
+    inset: -20%;
+    background: inherit;
+    filter: blur(40px);
+    opacity: 0.4;
+    z-index: -1;
+    animation: bloomPulse 4s ease-in-out infinite;
+  }
+
+  /* Electric Pulse */
   .electric-pulse {
     animation: electricPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    filter: drop-shadow(0 0 10px hsl(280 85% 65% / 0.5));
   }
-  
+
+  .electric-glow {
+    box-shadow: var(--shadow-glow);
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+
+  /* Gradient utilities */
+  .gradient-electric {
+    background: var(--gradient-plasma);
+  }
+
+  .gradient-nebula {
+    background: var(--gradient-nebula);
+  }
+
+  .gradient-soft {
+    background: var(--gradient-void);
+  }
+
+  .bg-gradient-soft {
+    background: var(--gradient-void);
+  }
+
+  /* Glass morphism header */
+  .glass-header {
+    background: hsl(250 30% 10% / 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid hsl(280 60% 50% / 0.1);
+  }
+
+  /* Motion animations */
+  .animate-float-slow {
+    animation: floatSlow 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: floatSlow 8s ease-in-out infinite 2s;
+  }
+
+  .animate-float-reverse {
+    animation: floatReverse 7s ease-in-out infinite 1s;
+  }
+
+  .animate-blob {
+    animation: blob 7s ease-in-out infinite;
+  }
+
+  .animate-blob-delayed {
+    animation: blob 9s ease-in-out infinite 3s;
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
   .fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
     opacity: 0;
     transform: translateY(20px);
   }
-  
-  .electric-glow {
-    box-shadow: var(--shadow-electric);
-  }
-  
-  /* Motion Graphics Animations */
-  .animate-float-slow {
-    animation: floatSlow 6s ease-in-out infinite;
-  }
-  
-  .animate-float-delayed {
-    animation: floatSlow 8s ease-in-out infinite 2s;
-  }
-  
-  .animate-float-reverse {
-    animation: floatReverse 7s ease-in-out infinite 1s;
-  }
-  
-  .animate-draw-line {
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-    animation: drawLine 8s ease-in-out infinite;
-  }
-  
-  .animate-draw-line-delayed {
-    stroke-dasharray: 800;
-    stroke-dashoffset: 800;
-    animation: drawLine 10s ease-in-out infinite 2s;
-  }
-  
-  .animate-draw-line-reverse {
-    stroke-dasharray: 600;
-    stroke-dashoffset: 600;
-    animation: drawLineReverse 9s ease-in-out infinite 1s;
-  }
-  
-  .animate-pulse-float {
-    animation: pulseFloat 4s ease-in-out infinite;
-  }
-  
-  .animate-pulse-float-delayed {
-    animation: pulseFloat 5s ease-in-out infinite 1.5s;
-  }
-  
-  .animate-pulse-float-reverse {
-    animation: pulseFloatReverse 6s ease-in-out infinite 0.5s;
-  }
-  
-  .animate-blob {
-    animation: blob 7s ease-in-out infinite;
-  }
-  
-  .animate-blob-delayed {
-    animation: blob 9s ease-in-out infinite 3s;
-  }
-  
-  .animate-blob-reverse {
-    animation: blobReverse 8s ease-in-out infinite 1.5s;
-  }
-  
-  /* Utility Classes */
-  .gradient-electric {
-    background: var(--gradient-electric);
-  }
-  
-  .gradient-soft {
-    background: var(--gradient-soft);
-  }
-  
-  .transition-smooth {
-    transition: var(--transition-smooth);
-  }
 }
 
 @layer utilities {
-  @keyframes electricPulse {
-    0%, 100% { 
-      opacity: 1;
+  /* Nebula floating animation */
+  @keyframes nebulaFloat {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(5%, 10%) scale(1.1);
+    }
+    50% {
+      transform: translate(-5%, 5%) scale(0.95);
+    }
+    75% {
+      transform: translate(3%, -5%) scale(1.05);
+    }
+  }
+
+  /* Aurora caustic shift */
+  @keyframes auroraShift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Caustic light rotation */
+  @keyframes causticRotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Bloom pulse */
+  @keyframes bloomPulse {
+    0%, 100% {
+      opacity: 0.3;
       transform: scale(1);
     }
-    50% { 
-      opacity: 0.8;
+    50% {
+      opacity: 0.5;
       transform: scale(1.05);
     }
   }
-  
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
+
+  /* Electric pulse */
+  @keyframes electricPulse {
+    0%, 100% {
       opacity: 1;
-      transform: translateY(0);
+      transform: scale(1);
+      filter: drop-shadow(0 0 10px hsl(280 85% 65% / 0.5));
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 20px hsl(280 85% 65% / 0.7));
     }
   }
-  
-  @keyframes sparkle {
-    0%, 100% { opacity: 0; transform: scale(0); }
-    50% { opacity: 1; transform: scale(1); }
+
+  /* Glow pulse */
+  @keyframes glowPulse {
+    0%, 100% {
+      box-shadow: 0 0 40px hsl(280 85% 65% / 0.3), 0 0 80px hsl(320 80% 55% / 0.15);
+    }
+    50% {
+      box-shadow: 0 0 60px hsl(280 85% 65% / 0.4), 0 0 120px hsl(320 80% 55% / 0.25);
+    }
   }
-  
-  /* Motion Graphics Keyframes */
+
+  /* Float animations */
   @keyframes floatSlow {
-    0%, 100% { 
+    0%, 100% {
       transform: translateY(0px) rotate(0deg);
     }
-    50% { 
+    50% {
       transform: translateY(-20px) rotate(5deg);
     }
   }
-  
+
   @keyframes floatReverse {
-    0%, 100% { 
+    0%, 100% {
       transform: translateY(0px) rotate(0deg);
     }
-    50% { 
+    50% {
       transform: translateY(15px) rotate(-3deg);
     }
   }
-  
-  @keyframes drawLine {
-    0% {
-      stroke-dashoffset: 1000;
-    }
-    50% {
-      stroke-dashoffset: 0;
-    }
-    100% {
-      stroke-dashoffset: -1000;
-    }
-  }
-  
-  @keyframes drawLineReverse {
-    0% {
-      stroke-dashoffset: -600;
-    }
-    50% {
-      stroke-dashoffset: 0;
-    }
-    100% {
-      stroke-dashoffset: 600;
-    }
-  }
-  
-  @keyframes pulseFloat {
-    0%, 100% { 
-      opacity: 0.3;
-      transform: translateY(0px) scale(1);
-    }
-    50% { 
-      opacity: 0.8;
-      transform: translateY(-10px) scale(1.2);
-    }
-  }
-  
-  @keyframes pulseFloatReverse {
-    0%, 100% { 
-      opacity: 0.4;
-      transform: translateY(0px) scale(1);
-    }
-    50% { 
-      opacity: 0.7;
-      transform: translateY(8px) scale(0.9);
-    }
-  }
-  
+
   @keyframes blob {
     0%, 100% {
       transform: translateY(0px) scale(1);
@@ -308,23 +468,35 @@ All colors MUST be HSL.
       transform: translateY(5px) scale(0.95);
     }
   }
-  
-  @keyframes blobReverse {
-    0%, 100% {
-      transform: translateX(0px) scale(1);
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
     }
-    33% {
-      transform: translateX(10px) scale(1.05);
-    }
-    66% {
-      transform: translateX(-5px) scale(0.98);
+    100% {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
-  
+
+  /* Plasma swirl for buttons */
+  @keyframes plasmaSwirl {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
   .animation-delay-300 {
     animation-delay: 300ms;
   }
-  
+
   .animation-delay-700 {
     animation-delay: 700ms;
   }
