@@ -58,6 +58,20 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Holographic palette additions
+        nebula: {
+          purple: "hsl(280 70% 40%)",
+          teal: "hsl(185 60% 35%)",
+          magenta: "hsl(320 70% 45%)",
+        },
+        plasma: {
+          DEFAULT: "hsl(280 85% 65%)",
+          glow: "hsl(280 85% 75%)",
+        },
+        crystal: {
+          DEFAULT: "hsl(250 30% 15%)",
+          light: "hsl(250 30% 25%)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -66,25 +80,42 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "nebula-float": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "25%": { transform: "translate(5%, 10%) scale(1.1)" },
+          "50%": { transform: "translate(-5%, 5%) scale(0.95)" },
+          "75%": { transform: "translate(3%, -5%) scale(1.05)" },
+        },
+        "plasma-pulse": {
+          "0%, 100%": { opacity: "0.6", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.02)" },
+        },
+        "crystal-shimmer": {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "nebula-float": "nebula-float 20s ease-in-out infinite",
+        "plasma-pulse": "plasma-pulse 3s ease-in-out infinite",
+        "crystal-shimmer": "crystal-shimmer 8s linear infinite",
+      },
+      backdropBlur: {
+        xs: "2px",
+      },
+      boxShadow: {
+        glow: "0 0 60px hsl(280 85% 65% / 0.3), 0 0 120px hsl(320 80% 55% / 0.15)",
+        crystal: "0 8px 32px hsl(280 60% 30% / 0.3), 0 0 1px hsl(0 0% 100% / 0.1)",
+        plasma: "0 0 40px hsl(280 85% 65% / 0.5), 0 0 80px hsl(320 80% 55% / 0.3)",
       },
     },
   },
