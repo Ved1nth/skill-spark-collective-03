@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import NebulaBackground from '@/components/NebulaBackground';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -24,7 +25,6 @@ const Auth = () => {
   });
 
   useEffect(() => {
-    // Check if user is already logged in
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         navigate('/');
@@ -115,15 +115,17 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-soft flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+      <NebulaBackground />
+      
+      <Card className="w-full max-w-md crystal-card relative z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/')}
-              className="p-2"
+              className="p-2 text-foreground/70 hover:text-foreground hover:bg-primary/10"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
@@ -131,24 +133,26 @@ const Auth = () => {
           </div>
           <div className="flex items-center space-x-2">
             <CheckCircle className="h-6 w-6 text-primary" />
-            <CardTitle className="text-2xl">Welcome to GTA</CardTitle>
+            <CardTitle className="text-2xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Welcome to GTA
+            </CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-muted-foreground">
             Sign in or create an account to connect with talented students
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+              <TabsTrigger value="signin" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Sign Up</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signin" className="space-y-4 mt-4">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-email" className="text-foreground">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -157,14 +161,14 @@ const Auth = () => {
                       placeholder="yourname@rnsit.ac.in"
                       value={signInData.email}
                       onChange={(e) => setSignInData({ ...signInData, email: e.target.value })}
-                      className="pl-10"
+                      className="pl-10 bg-card/50 border-primary/20 focus:border-primary/50"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="signin-password" className="text-foreground">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -173,13 +177,13 @@ const Auth = () => {
                       placeholder="Enter your password"
                       value={signInData.password}
                       onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
-                      className="pl-10"
+                      className="pl-10 bg-card/50 border-primary/20 focus:border-primary/50"
                       required
                     />
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full gradient-electric" disabled={isLoading}>
+                <Button type="submit" className="w-full plasma-button text-primary-foreground" disabled={isLoading}>
                   {isLoading ? 'Signing In...' : 'Sign In'}
                 </Button>
               </form>
@@ -188,7 +192,7 @@ const Auth = () => {
             <TabsContent value="signup" className="space-y-4 mt-4">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
+                  <Label htmlFor="signup-name" className="text-foreground">Full Name</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -197,14 +201,14 @@ const Auth = () => {
                       placeholder="Enter your full name"
                       value={signUpData.fullName}
                       onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
-                      className="pl-10"
+                      className="pl-10 bg-card/50 border-primary/20 focus:border-primary/50"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">RNSIT Email</Label>
+                  <Label htmlFor="signup-email" className="text-foreground">RNSIT Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -213,14 +217,14 @@ const Auth = () => {
                       placeholder="yourname@rnsit.ac.in"
                       value={signUpData.email}
                       onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
-                      className="pl-10"
+                      className="pl-10 bg-card/50 border-primary/20 focus:border-primary/50"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" className="text-foreground">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -229,19 +233,19 @@ const Auth = () => {
                       placeholder="Create a password (min 6 chars)"
                       value={signUpData.password}
                       onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                      className="pl-10"
+                      className="pl-10 bg-card/50 border-primary/20 focus:border-primary/50"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-department">Department</Label>
+                  <Label htmlFor="signup-department" className="text-foreground">Department</Label>
                   <select
                     id="signup-department"
                     value={signUpData.department}
                     onChange={(e) => setSignUpData({ ...signUpData, department: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-md bg-background text-foreground border-border"
+                    className="w-full px-3 py-2 border rounded-lg bg-card/50 text-foreground border-primary/20 focus:border-primary/50 focus:outline-none"
                     required
                   >
                     <option value="">Select your department</option>
@@ -257,12 +261,12 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-year">Academic Year</Label>
+                  <Label htmlFor="signup-year" className="text-foreground">Academic Year</Label>
                   <select
                     id="signup-year"
                     value={signUpData.year}
                     onChange={(e) => setSignUpData({ ...signUpData, year: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-md bg-background text-foreground border-border"
+                    className="w-full px-3 py-2 border rounded-lg bg-card/50 text-foreground border-primary/20 focus:border-primary/50 focus:outline-none"
                     required
                   >
                     <option value="">Select your year</option>
@@ -275,7 +279,7 @@ const Auth = () => {
                   </select>
                 </div>
 
-                <Button type="submit" className="w-full gradient-electric" disabled={isLoading}>
+                <Button type="submit" className="w-full plasma-button text-primary-foreground" disabled={isLoading}>
                   {isLoading ? 'Creating Account...' : 'Create Account'}
                 </Button>
               </form>
