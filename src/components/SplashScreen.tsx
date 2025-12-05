@@ -28,8 +28,8 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
 
   return (
     <div className={`min-h-screen bg-background flex flex-col items-center justify-center relative overflow-hidden transition-all duration-500 ${animateOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
-      {/* Nebula Background */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Nebula Background - Only visible in dark mode */}
+      <div className="absolute inset-0 overflow-hidden opacity-0 dark:opacity-100 transition-opacity duration-300">
         <div className="absolute w-[60vw] h-[60vw] rounded-full opacity-40 blur-[100px] animate-nebula-float"
           style={{
             background: 'radial-gradient(circle, hsl(280 70% 40% / 0.6), transparent 70%)',
@@ -55,10 +55,28 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
         />
       </div>
 
-      {/* Grid pattern */}
-      <div className="absolute inset-0 opacity-[0.03]"
+      {/* Light mode subtle gradient */}
+      <div className="absolute inset-0 dark:hidden">
+        <div className="absolute w-[60vw] h-[60vw] rounded-full opacity-20 blur-[100px]"
+          style={{
+            background: 'radial-gradient(circle, hsl(262 83% 58% / 0.3), transparent 70%)',
+            top: '-20%',
+            left: '-20%',
+          }}
+        />
+        <div className="absolute w-[50vw] h-[50vw] rounded-full opacity-15 blur-[80px]"
+          style={{
+            background: 'radial-gradient(circle, hsl(320 70% 55% / 0.2), transparent 70%)',
+            bottom: '-15%',
+            right: '-10%',
+          }}
+        />
+      </div>
+
+      {/* Grid pattern - darker in dark mode */}
+      <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, hsl(280 85% 65%) 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
           backgroundSize: '50px 50px'
         }}
       />
@@ -66,31 +84,19 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
       {/* Letter Animations */}
       <div className="flex items-center justify-center space-x-4 relative z-10">
         <div className={`transition-all duration-700 ${showG ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-50'}`}>
-          <span className="text-8xl font-bold text-primary electric-pulse"
-            style={{ 
-              filter: 'drop-shadow(0 0 30px hsl(280 85% 65% / 0.8))',
-              textShadow: '0 0 40px hsl(280 85% 65% / 0.6)'
-            }}>
+          <span className="text-8xl font-bold text-primary dark:electric-pulse">
             G
           </span>
         </div>
 
         <div className={`transition-all duration-700 ${showT ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-50'}`}>
-          <span className="text-8xl font-bold text-accent electric-pulse"
-            style={{ 
-              filter: 'drop-shadow(0 0 30px hsl(320 80% 55% / 0.8))',
-              textShadow: '0 0 40px hsl(320 80% 55% / 0.6)'
-            }}>
+          <span className="text-8xl font-bold text-accent dark:electric-pulse">
             T
           </span>
         </div>
 
         <div className={`transition-all duration-700 ${showA ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-50'}`}>
-          <span className="text-8xl font-bold text-primary electric-pulse"
-            style={{ 
-              filter: 'drop-shadow(0 0 30px hsl(280 85% 65% / 0.8))',
-              textShadow: '0 0 40px hsl(280 85% 65% / 0.6)'
-            }}>
+          <span className="text-8xl font-bold text-primary dark:electric-pulse">
             A
           </span>
         </div>

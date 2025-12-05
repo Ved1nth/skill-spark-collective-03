@@ -203,29 +203,29 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-0 md:p-4">
-      <div className="w-full max-w-4xl h-full md:h-[600px] mx-auto bg-white dark:bg-gray-900 md:rounded-xl overflow-hidden shadow-2xl flex">
+      <div className="w-full max-w-4xl h-full md:h-[600px] mx-auto bg-background md:rounded-xl overflow-hidden shadow-2xl flex border border-border">
         {/* Conversations List - Instagram Style */}
-        <div className={`w-full md:w-1/3 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 ${selectedConversation ? 'hidden md:block' : 'block'}`}>
+        <div className={`w-full md:w-1/3 border-r border-border bg-background ${selectedConversation ? 'hidden md:block' : 'block'}`}>
           {/* Header */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-3">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-white text-sm">
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
                     {currentUser?.fullName?.split(' ').map((n: string) => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
-                <h2 className="text-lg md:text-xl font-semibold">{currentUser?.fullName?.split(' ')[0]}</h2>
+                <h2 className="text-lg md:text-xl font-semibold text-foreground">{currentUser?.fullName?.split(' ')[0]}</h2>
               </div>
-              <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2">
+              <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-muted p-2 text-foreground">
                 <X className="h-5 w-5" />
               </Button>
             </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search" 
-                className="pl-10 bg-gray-100 dark:bg-gray-800 border-none rounded-lg"
+                className="pl-10 bg-muted border-border rounded-lg text-foreground placeholder:text-muted-foreground"
               />
             </div>
           </div>
@@ -234,9 +234,9 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
           <ScrollArea className="h-[calc(100vh-120px)] md:h-[490px]">
             <div className="p-0">
               {conversations.length === 0 ? (
-                <div className="text-center text-gray-500 py-12 md:py-16 px-4">
+                <div className="text-center text-muted-foreground py-12 md:py-16 px-4">
                   <MessageCircle className="h-10 md:h-12 w-10 md:w-12 mx-auto mb-3 opacity-50" />
-                  <p className="text-base md:text-lg font-medium">Your Messages</p>
+                  <p className="text-base md:text-lg font-medium text-foreground">Your Messages</p>
                   <p className="text-sm">Send private messages to friends</p>
                 </div>
               ) : (
@@ -251,33 +251,33 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                         setSelectedConversation(conversation.id);
                         loadMessages(conversation.id);
                       }}
-                      className={`p-3 md:p-4 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700 ${
-                        isSelected ? 'bg-gray-100 dark:bg-gray-800' : ''
+                      className={`p-3 md:p-4 cursor-pointer transition-all duration-200 hover:bg-muted active:bg-muted/80 ${
+                        isSelected ? 'bg-muted' : ''
                       }`}
                     >
                       <div className="flex items-center space-x-3">
                         <div className="relative">
                           <Avatar className="h-12 md:h-14 w-12 md:w-14">
-                            <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white text-sm">
+                            <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
                               {otherUserName?.split(' ').map(n => n[0]).join('') || 'U'}
                             </AvatarFallback>
                           </Avatar>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium text-gray-900 dark:text-white truncate text-sm md:text-base">
+                            <p className="font-medium text-foreground truncate text-sm md:text-base">
                               {otherUserName}
                             </p>
                             <div className="flex items-center space-x-2">
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-muted-foreground">
                                 {formatTime(conversation.lastMessageTime)}
                               </span>
                               {conversation.unreadCount > 0 && (
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <div className="w-2 h-2 bg-primary rounded-full"></div>
                               )}
                             </div>
                           </div>
-                          <p className="text-xs md:text-sm text-gray-500 truncate mt-1">
+                          <p className="text-xs md:text-sm text-muted-foreground truncate mt-1">
                             {conversation.lastMessage}
                           </p>
                         </div>
@@ -291,41 +291,41 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
         </div>
 
         {/* Messages Area - Instagram Style */}
-        <div className={`flex-1 flex flex-col bg-white dark:bg-gray-900 ${selectedConversation ? 'flex' : 'hidden md:flex'}`}>
+        <div className={`flex-1 flex flex-col bg-background ${selectedConversation ? 'flex' : 'hidden md:flex'}`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+              <div className="p-3 md:p-4 border-b border-border bg-background">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="md:hidden p-2 mr-2"
+                      className="md:hidden p-2 mr-2 text-foreground hover:bg-muted"
                       onClick={() => setSelectedConversation(null)}
                     >
                       <ArrowLeft className="h-5 w-5" />
                     </Button>
                     <Avatar className="h-8 md:h-10 w-8 md:w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white text-sm">
+                      <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
                         {conversations.find(c => c.id === selectedConversation)?.participantNames.find(name => name !== currentUser.fullName)?.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white text-sm md:text-base">
+                      <h3 className="font-semibold text-foreground text-sm md:text-base">
                         {conversations.find(c => c.id === selectedConversation)?.participantNames.find(name => name !== currentUser.fullName)}
                       </h3>
-                      <p className="text-xs text-gray-500">Active now</p>
+                      <p className="text-xs text-muted-foreground">Active now</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-1 md:space-x-2">
-                    <Button variant="ghost" size="sm" className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2">
+                    <Button variant="ghost" size="sm" className="hover:bg-muted p-2 text-foreground">
                       <Phone className="h-4 md:h-5 w-4 md:w-5" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2">
+                    <Button variant="ghost" size="sm" className="hover:bg-muted p-2 text-foreground">
                       <Video className="h-4 md:h-5 w-4 md:w-5" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 md:block hidden">
+                    <Button variant="ghost" size="sm" className="hover:bg-muted p-2 md:block hidden text-foreground">
                       <Info className="h-4 md:h-5 w-4 md:w-5" />
                     </Button>
                   </div>
@@ -333,7 +333,7 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
               </div>
 
               {/* Messages - Instagram Style */}
-              <ScrollArea className="flex-1 px-3 md:px-6 py-3 md:py-4 bg-white dark:bg-gray-900">
+              <ScrollArea className="flex-1 px-3 md:px-6 py-3 md:py-4 bg-background">
                 <div className="space-y-3 md:space-y-4">
                   {messages.map((message, index) => {
                     const isFromMe = message.senderId === currentUser.id;
@@ -343,15 +343,15 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                     return (
                       <div key={message.id}>
                         {showTime && (
-                          <div className="text-center text-xs text-gray-500 mb-3 md:mb-4">
+                          <div className="text-center text-xs text-muted-foreground mb-3 md:mb-4">
                             {formatMessageTime(message.timestamp)}
                           </div>
                         )}
                         <div className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}>
                           <div className={`max-w-[280px] md:max-w-xs lg:max-w-sm px-3 md:px-4 py-2 rounded-2xl ${
                             isFromMe
-                              ? 'bg-blue-500 text-white ml-2 md:ml-4'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white mr-2 md:mr-4'
+                              ? 'bg-primary text-primary-foreground ml-2 md:ml-4'
+                              : 'bg-muted text-foreground mr-2 md:mr-4'
                           }`}>
                             <p className="text-sm leading-relaxed">{message.content}</p>
                           </div>
@@ -363,7 +363,7 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
               </ScrollArea>
 
               {/* Message Input - Instagram Style */}
-              <div className="p-3 md:p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+              <div className="p-3 md:p-4 border-t border-border bg-background">
                 <div className="flex items-center space-x-2 md:space-x-3">
                   <div className="flex-1 relative">
                     <Input
@@ -371,13 +371,13 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      className="rounded-2xl border-gray-300 dark:border-gray-600 pl-4 pr-12 bg-gray-100 dark:bg-gray-800 border-none text-sm md:text-base py-2 md:py-2.5"
+                      className="rounded-2xl border-border pl-4 pr-12 bg-muted text-foreground placeholder:text-muted-foreground text-sm md:text-base py-2 md:py-2.5"
                     />
                     {newMessage.trim() && (
                       <Button
                         onClick={sendMessage}
                         size="sm"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-full h-6 w-6 p-1 touch-manipulation"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full h-6 w-6 p-1 touch-manipulation"
                       >
                         <Send className="h-3 w-3" />
                       </Button>
@@ -387,7 +387,7 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-900">
+            <div className="flex-1 flex items-center justify-center bg-background">
               <div className="text-center">
                 <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
                   <MessageCircle className="h-12 w-12 text-white" />

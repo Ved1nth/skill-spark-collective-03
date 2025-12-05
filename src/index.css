@@ -2,42 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Holographic Dreamscape Design System */
+/* Dual Theme Design System: Light = Clean Minimal, Dark = Holographic Dreamscape */
 
 @layer base {
   :root {
-    /* Deep atmospheric void base */
-    --background: 248 25% 6%;
-    --foreground: 220 20% 95%;
+    /* Light Mode - Clean, Minimal Apple-inspired */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 10%;
 
-    --card: 250 30% 10%;
-    --card-foreground: 220 20% 95%;
+    --card: 0 0% 98%;
+    --card-foreground: 240 10% 10%;
 
-    --popover: 250 30% 10%;
-    --popover-foreground: 220 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
 
-    /* Electric plasma primary - living energy */
-    --primary: 280 85% 65%;
+    --primary: 262 83% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 280 60% 20%;
+    --primary-soft: 262 60% 95%;
 
-    /* Deep teal secondary */
-    --secondary: 185 70% 15%;
-    --secondary-foreground: 185 60% 80%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 30%;
 
-    --muted: 250 25% 15%;
-    --muted-foreground: 220 15% 55%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 5% 45%;
 
-    /* Electric magenta accent */
-    --accent: 320 80% 55%;
+    --accent: 320 70% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 250 30% 20%;
-    --input: 250 30% 15%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 262 83% 58%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 10% 10%;
+    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 320 70% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 262 83% 58%;
+
+    /* Light mode shadows */
+    --shadow-glow: 0 4px 20px hsl(262 83% 58% / 0.15);
+    --shadow-crystal: 0 2px 10px hsl(0 0% 0% / 0.08);
+    --shadow-plasma: 0 4px 20px hsl(262 83% 58% / 0.2);
+  }
+
+  .dark {
+    /* Dark Mode - Holographic Dreamscape */
+    --background: 248 25% 4%;
+    --foreground: 220 20% 95%;
+
+    --card: 250 30% 8%;
+    --card-foreground: 220 20% 95%;
+
+    --popover: 250 30% 8%;
+    --popover-foreground: 220 20% 95%;
+
+    --primary: 280 85% 65%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 280 60% 20%;
+
+    --secondary: 185 70% 15%;
+    --secondary-foreground: 185 60% 80%;
+
+    --muted: 250 25% 12%;
+    --muted-foreground: 220 15% 55%;
+
+    --accent: 320 80% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 220 20% 95%;
+
+    --border: 250 30% 18%;
+    --input: 250 30% 12%;
     --ring: 280 85% 65%;
+    
+    --sidebar-background: 250 25% 6%;
+    --sidebar-foreground: 220 20% 95%;
+    --sidebar-primary: 280 85% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 320 80% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 250 30% 18%;
+    --sidebar-ring: 280 85% 65%;
 
     /* Holographic gradients */
     --gradient-nebula: linear-gradient(135deg, 
@@ -64,61 +118,7 @@
     --shadow-crystal: 0 8px 32px hsl(280 60% 30% / 0.3), 0 0 1px hsl(0 0% 100% / 0.1);
     --shadow-plasma: 0 0 40px hsl(280 85% 65% / 0.5), 0 0 80px hsl(320 80% 55% / 0.3);
     
-    /* Glass refraction */
     --glass-refraction: hsl(280 60% 80% / 0.05);
-
-    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-
-    --radius: 1rem;
-
-    --sidebar-background: 250 25% 8%;
-    --sidebar-foreground: 220 20% 95%;
-    --sidebar-primary: 280 85% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 320 80% 55%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 250 30% 20%;
-    --sidebar-ring: 280 85% 65%;
-  }
-
-  .dark {
-    /* Dark mode uses same holographic palette */
-    --background: 248 25% 4%;
-    --foreground: 220 20% 95%;
-
-    --card: 250 30% 8%;
-    --card-foreground: 220 20% 95%;
-
-    --popover: 250 30% 8%;
-    --popover-foreground: 220 20% 95%;
-
-    --primary: 280 85% 65%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 185 70% 15%;
-    --secondary-foreground: 185 60% 80%;
-
-    --muted: 250 25% 12%;
-    --muted-foreground: 220 15% 55%;
-
-    --accent: 320 80% 55%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 220 20% 95%;
-
-    --border: 250 30% 18%;
-    --input: 250 30% 12%;
-    --ring: 280 85% 65%;
-    
-    --sidebar-background: 250 25% 6%;
-    --sidebar-foreground: 220 20% 95%;
-    --sidebar-primary: 280 85% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 320 80% 55%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 250 30% 18%;
-    --sidebar-ring: 280 85% 65%;
   }
 }
 
@@ -129,19 +129,29 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    background: var(--gradient-void);
     min-height: 100vh;
+  }
+
+  /* Dark mode specific body styling */
+  .dark body {
+    background: var(--gradient-void);
   }
 }
 
 @layer components {
-  /* Kinetic Atmosphere - Nebula Background */
+  /* Kinetic Atmosphere - Nebula Background (Dark mode only) */
   .nebula-atmosphere {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
     overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .dark .nebula-atmosphere {
+    opacity: 1;
   }
 
   .nebula-orb {
@@ -191,8 +201,18 @@
     animation-delay: -15s;
   }
 
-  /* Crystalline Cards */
+  /* Crystalline Cards - Different styles for light/dark */
   .crystal-card {
+    @apply bg-card border border-border rounded-lg;
+    transition: all 0.3s ease;
+  }
+
+  .crystal-card:hover {
+    @apply shadow-lg;
+  }
+
+  /* Dark mode crystal card with holographic effect */
+  .dark .crystal-card {
     background: linear-gradient(135deg, 
       hsl(250 30% 15% / 0.4),
       hsl(250 30% 10% / 0.6));
@@ -206,7 +226,7 @@
     overflow: hidden;
   }
 
-  .crystal-card::before {
+  .dark .crystal-card::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -217,11 +237,11 @@
     pointer-events: none;
   }
 
-  .crystal-card:hover::before {
+  .dark .crystal-card:hover::before {
     opacity: 1;
   }
 
-  .crystal-card::after {
+  .dark .crystal-card::after {
     content: '';
     position: absolute;
     top: -50%;
@@ -238,17 +258,26 @@
     pointer-events: none;
   }
 
-  /* Liquid Light Interactive Elements */
+  /* Plasma Button - Different styles for light/dark */
   .plasma-button {
+    @apply bg-primary text-primary-foreground;
     position: relative;
-    background: var(--gradient-plasma);
-    border: none;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
+  }
+
+  .plasma-button:hover {
+    transform: translateY(-1px);
     box-shadow: var(--shadow-plasma);
   }
 
-  .plasma-button::before {
+  /* Dark mode plasma button with living energy effect */
+  .dark .plasma-button {
+    background: var(--gradient-plasma);
+    box-shadow: var(--shadow-plasma);
+  }
+
+  .dark .plasma-button::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -259,11 +288,11 @@
     transition: opacity 0.3s ease;
   }
 
-  .plasma-button:hover::before {
+  .dark .plasma-button:hover::before {
     opacity: 1;
   }
 
-  .plasma-button::after {
+  .dark .plasma-button::after {
     content: '';
     position: absolute;
     inset: 2px;
@@ -274,20 +303,31 @@
     pointer-events: none;
   }
 
-  .plasma-button:hover {
+  .dark .plasma-button:hover {
     transform: translateY(-2px);
     box-shadow: 
       var(--shadow-plasma),
       0 20px 40px hsl(280 85% 65% / 0.3);
   }
 
-  /* Cinematic Bloom */
+  /* Glass Header - Different styles for light/dark */
+  .glass-header {
+    @apply bg-background/80 backdrop-blur-md border-b border-border;
+  }
+
+  .dark .glass-header {
+    background: hsl(250 30% 10% / 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid hsl(280 60% 50% / 0.1);
+  }
+
+  /* Cinematic Bloom (Dark mode only) */
   .bloom-effect {
     filter: blur(0);
     position: relative;
   }
 
-  .bloom-effect::after {
+  .dark .bloom-effect::after {
     content: '';
     position: absolute;
     inset: -20%;
@@ -298,70 +338,95 @@
     animation: bloomPulse 4s ease-in-out infinite;
   }
 
-  /* Electric Pulse */
+  /* Electric Pulse (Dark mode only) */
   .electric-pulse {
+    @apply text-primary;
+  }
+
+  .dark .electric-pulse {
     animation: electricPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     filter: drop-shadow(0 0 10px hsl(280 85% 65% / 0.5));
   }
 
   .electric-glow {
     box-shadow: var(--shadow-glow);
+  }
+
+  .dark .electric-glow {
     animation: glowPulse 3s ease-in-out infinite;
   }
 
   /* Gradient utilities */
   .gradient-electric {
+    @apply bg-primary;
+  }
+
+  .dark .gradient-electric {
     background: var(--gradient-plasma);
   }
 
   .gradient-nebula {
+    @apply bg-muted;
+  }
+
+  .dark .gradient-nebula {
     background: var(--gradient-nebula);
   }
 
-  .gradient-soft {
-    background: var(--gradient-void);
-  }
-
-  .bg-gradient-soft {
-    background: var(--gradient-void);
-  }
-
-  /* Glass morphism header */
-  .glass-header {
-    background: hsl(250 30% 10% / 0.7);
-    backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid hsl(280 60% 50% / 0.1);
-  }
-
-  /* Motion animations */
+  /* Motion animations (Dark mode only for floating effects) */
   .animate-float-slow {
+    animation: none;
+  }
+
+  .dark .animate-float-slow {
     animation: floatSlow 6s ease-in-out infinite;
   }
 
   .animate-float-delayed {
+    animation: none;
+  }
+
+  .dark .animate-float-delayed {
     animation: floatSlow 8s ease-in-out infinite 2s;
   }
 
   .animate-float-reverse {
+    animation: none;
+  }
+
+  .dark .animate-float-reverse {
     animation: floatReverse 7s ease-in-out infinite 1s;
   }
 
   .animate-blob {
+    animation: none;
+  }
+
+  .dark .animate-blob {
     animation: blob 7s ease-in-out infinite;
   }
 
   .animate-blob-delayed {
+    animation: none;
+  }
+
+  .dark .animate-blob-delayed {
     animation: blob 9s ease-in-out infinite 3s;
   }
 
   .transition-smooth {
-    transition: var(--transition-smooth);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
     opacity: 0;
     transform: translateY(20px);
+  }
+
+  /* Shadow glow utility */
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
   }
 }
 
