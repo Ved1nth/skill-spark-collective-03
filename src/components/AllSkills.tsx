@@ -32,10 +32,32 @@ const AllSkills = () => {
   const fetchDbSkills = async () => {
     const { data, error } = await supabase
       .from('skills')
-      .select('*, profiles(full_name)')
+      .select('*')
       .order('created_at', { ascending: false });
     
-    if (data) setDbSkills(data);
+    if (error) {
+      console.error('Error fetching skills:', error);
+      setLoading(false);
+      return;
+    }
+    
+    // Fetch profile names for each skill
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map(s => s.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', userIds);
+      
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+      const skillsWithNames = data.map(skill => ({
+        ...skill,
+        owner_name: profileMap.get(skill.user_id) || 'Unknown'
+      }));
+      setDbSkills(skillsWithNames);
+    } else {
+      setDbSkills([]);
+    }
     setLoading(false);
   };
 
@@ -72,7 +94,7 @@ const AllSkills = () => {
       color: 'from-primary/20 to-accent/20 border-primary/30',
       category: skill.category,
       isUserSkill: true,
-      ownerName: skill.profiles?.full_name || 'Unknown',
+      ownerName: skill.owner_name || 'Unknown',
     };
   });
 

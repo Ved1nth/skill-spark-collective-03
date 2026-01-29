@@ -1,35 +1,47 @@
 import { useState, useEffect } from 'react';
-import { X, MessageCircle, Send, User, Phone, Video, Info, Search, ArrowLeft, Users as UsersIcon } from 'lucide-react';
+import { X, MessageCircle, Send, Phone, Video, Info, Search, ArrowLeft, Users as UsersIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Message {
   id: string;
-  conversationId: string;
-  senderId: string;
-  senderName: string;
-  receiverId: string;
-  receiverName: string;
+  sender_id: string;
+  receiver_id: string;
   content: string;
-  timestamp: string;
+  created_at: string;
   read: boolean;
-  type?: 'individual' | 'community';
+}
+
+interface CommunityMessage {
+  id: string;
+  community_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  sender_name?: string;
 }
 
 interface Conversation {
   id: string;
-  participants: string[];
-  participantNames: string[];
-  lastMessage: string;
-  lastMessageTime: string;
-  unreadCount: number;
-  type: 'individual' | 'community';
-  communityName?: string;
+  other_user_id: string;
+  other_user_name: string;
+  last_message: string;
+  last_message_time: string;
+  unread_count: number;
+}
+
+interface Community {
+  id: string;
+  name: string;
+  description: string | null;
+  last_message?: string;
+  last_message_time?: string;
+  member_count?: number;
 }
 
 interface MessagesModalProps {
@@ -39,260 +51,420 @@ interface MessagesModalProps {
 }
 
 const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => {
+  const [activeTab, setActiveTab] = useState<'direct' | 'communities'>('direct');
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [communities, setCommunities] = useState<Community[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [selectedCommunity, setSelectedCommunity] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [communityMessages, setCommunityMessages] = useState<CommunityMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [profiles, setProfiles] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     if (isOpen && currentUser) {
       loadConversations();
+      loadCommunities();
     }
   }, [isOpen, currentUser]);
 
-  const loadConversations = () => {
-    const allMessages = JSON.parse(localStorage.getItem('gta_messages') || '[]');
-    const userCommunities = JSON.parse(localStorage.getItem('user_communities') || '[]');
-    const userConversations = new Map<string, Conversation>();
+  // Set up realtime subscription for messages
+  useEffect(() => {
+    if (!isOpen || !currentUser) return;
 
-    // Load individual messages
-    allMessages.forEach((message: Message) => {
-      if (message.type !== 'community' && (message.senderId === currentUser.id || message.receiverId === currentUser.id)) {
-        const otherUserId = message.senderId === currentUser.id ? message.receiverId : message.senderId;
-        const otherUserName = message.senderId === currentUser.id ? message.receiverName : message.senderName;
-        const conversationId = [currentUser.id, otherUserId].sort().join('-');
-
-        if (!userConversations.has(conversationId)) {
-          userConversations.set(conversationId, {
-            id: conversationId,
-            participants: [currentUser.id, otherUserId],
-            participantNames: [currentUser.fullName, otherUserName],
-            lastMessage: message.content,
-            lastMessageTime: message.timestamp,
-            unreadCount: 0,
-            type: 'individual'
-          });
+    const channel = supabase
+      .channel('messages-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          const newMsg = payload.new as Message;
+          if (newMsg.sender_id === currentUser.id || newMsg.receiver_id === currentUser.id) {
+            if (selectedConversation) {
+              const convUserId = selectedConversation;
+              if (newMsg.sender_id === convUserId || newMsg.receiver_id === convUserId) {
+                setMessages(prev => [...prev, newMsg]);
+              }
+            }
+            loadConversations();
+          }
         }
+      )
+      .subscribe();
 
-        const conversation = userConversations.get(conversationId)!;
-        if (new Date(message.timestamp) > new Date(conversation.lastMessageTime)) {
-          conversation.lastMessage = message.content;
-          conversation.lastMessageTime = message.timestamp;
-        }
-
-        if (!message.read && message.receiverId === currentUser.id) {
-          conversation.unreadCount++;
-        }
-      }
-    });
-
-    // Load community conversations
-    userCommunities.forEach((community: any) => {
-      if (community.members.includes(currentUser.id)) {
-        const communityMessages = allMessages.filter((m: Message) => 
-          m.type === 'community' && m.conversationId === community.id
-        );
-        
-        const lastMessage = communityMessages.sort((a: Message, b: Message) => 
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        )[0];
-
-        if (lastMessage || communityMessages.length === 0) {
-          userConversations.set(community.id, {
-            id: community.id,
-            participants: community.members,
-            participantNames: [community.name],
-            lastMessage: lastMessage?.content || 'No messages yet',
-            lastMessageTime: lastMessage?.timestamp || new Date().toISOString(),
-            unreadCount: communityMessages.filter((m: Message) => !m.read && m.senderId !== currentUser.id).length,
-            type: 'community',
-            communityName: community.name
-          });
-        }
-      }
-    });
-
-    const conversationsList = Array.from(userConversations.values())
-      .sort((a, b) => new Date(b.lastMessageTime).getTime() - new Date(a.lastMessageTime).getTime());
-
-    setConversations(conversationsList);
-  };
-
-  const loadMessages = (conversationId: string) => {
-    const allMessages = JSON.parse(localStorage.getItem('gta_messages') || '[]');
-    const conversationMessages = allMessages
-      .filter((message: Message) => message.conversationId === conversationId)
-      .sort((a: Message, b: Message) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-
-    // Mark messages as read
-    const updatedMessages = allMessages.map((message: Message) => {
-      if (message.conversationId === conversationId && message.receiverId === currentUser.id) {
-        return { ...message, read: true };
-      }
-      return message;
-    });
-
-    localStorage.setItem('gta_messages', JSON.stringify(updatedMessages));
-    setMessages(conversationMessages);
-    loadConversations(); // Refresh conversations to update unread counts
-  };
-
-  const sendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
-
-    const conversation = conversations.find(c => c.id === selectedConversation);
-    if (!conversation) return;
-
-    const receiverId = conversation.participants.find(id => id !== currentUser.id);
-    const receiverName = conversation.participantNames.find(name => name !== currentUser.fullName);
-
-    const message: Message = {
-      id: Date.now().toString(),
-      conversationId: selectedConversation,
-      senderId: currentUser.id,
-      senderName: currentUser.fullName,
-      receiverId: receiverId!,
-      receiverName: receiverName!,
-      content: newMessage.trim(),
-      timestamp: new Date().toISOString(),
-      read: false
+    return () => {
+      supabase.removeChannel(channel);
     };
+  }, [isOpen, currentUser, selectedConversation]);
 
-    const allMessages = JSON.parse(localStorage.getItem('gta_messages') || '[]');
-    allMessages.push(message);
-    localStorage.setItem('gta_messages', JSON.stringify(allMessages));
+  const loadConversations = async () => {
+    if (!currentUser) return;
 
-    setMessages(prev => [...prev, message]);
-    setNewMessage('');
+    const { data: sentMessages } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('sender_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    const { data: receivedMessages } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('receiver_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    const allMessages = [...(sentMessages || []), ...(receivedMessages || [])];
+    
+    // Get unique user IDs
+    const userIds = new Set<string>();
+    allMessages.forEach(msg => {
+      if (msg.sender_id !== currentUser.id) userIds.add(msg.sender_id);
+      if (msg.receiver_id !== currentUser.id) userIds.add(msg.receiver_id);
+    });
+
+    // Fetch profiles
+    if (userIds.size > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', Array.from(userIds));
+      
+      const profileMap = new Map<string, string>();
+      profilesData?.forEach(p => profileMap.set(p.user_id, p.full_name));
+      setProfiles(profileMap);
+    }
+
+    // Group by conversation
+    const conversationsMap = new Map<string, Conversation>();
+    allMessages.forEach(msg => {
+      const otherUserId = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
+      
+      if (!conversationsMap.has(otherUserId)) {
+        conversationsMap.set(otherUserId, {
+          id: otherUserId,
+          other_user_id: otherUserId,
+          other_user_name: profiles.get(otherUserId) || 'User',
+          last_message: msg.content,
+          last_message_time: msg.created_at,
+          unread_count: 0
+        });
+      }
+
+      const conv = conversationsMap.get(otherUserId)!;
+      if (new Date(msg.created_at) > new Date(conv.last_message_time)) {
+        conv.last_message = msg.content;
+        conv.last_message_time = msg.created_at;
+      }
+      if (!msg.read && msg.receiver_id === currentUser.id) {
+        conv.unread_count++;
+      }
+    });
+
+    // Update names from profiles
+    const { data: freshProfiles } = await supabase
+      .from('profiles')
+      .select('user_id, full_name')
+      .in('user_id', Array.from(conversationsMap.keys()));
+    
+    freshProfiles?.forEach(p => {
+      const conv = conversationsMap.get(p.user_id);
+      if (conv) conv.other_user_name = p.full_name;
+    });
+
+    setConversations(Array.from(conversationsMap.values())
+      .sort((a, b) => new Date(b.last_message_time).getTime() - new Date(a.last_message_time).getTime()));
+  };
+
+  const loadCommunities = async () => {
+    if (!currentUser) return;
+
+    // Get communities the user is a member of
+    const { data: memberships } = await supabase
+      .from('community_members')
+      .select('community_id')
+      .eq('user_id', currentUser.id);
+
+    if (!memberships || memberships.length === 0) {
+      setCommunities([]);
+      return;
+    }
+
+    const communityIds = memberships.map(m => m.community_id);
+    
+    const { data: communitiesData } = await supabase
+      .from('communities')
+      .select('*')
+      .in('id', communityIds);
+
+    setCommunities(communitiesData || []);
+  };
+
+  const loadMessages = async (otherUserId: string) => {
+    if (!currentUser) return;
+
+    const { data } = await supabase
+      .from('messages')
+      .select('*')
+      .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${currentUser.id})`)
+      .order('created_at', { ascending: true });
+
+    setMessages(data || []);
+
+    // Mark as read
+    await supabase
+      .from('messages')
+      .update({ read: true })
+      .eq('sender_id', otherUserId)
+      .eq('receiver_id', currentUser.id);
+
     loadConversations();
   };
 
-  const getTotalUnreadCount = () => {
-    return conversations.reduce((total, conv) => total + conv.unreadCount, 0);
+  const loadCommunityMessages = async (communityId: string) => {
+    const { data } = await supabase
+      .from('community_messages')
+      .select('*')
+      .eq('community_id', communityId)
+      .order('created_at', { ascending: true });
+
+    // Fetch sender names
+    if (data && data.length > 0) {
+      const senderIds = [...new Set(data.map(m => m.sender_id))];
+      const { data: senderProfiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', senderIds);
+      
+      const senderMap = new Map(senderProfiles?.map(p => [p.user_id, p.full_name]) || []);
+      
+      setCommunityMessages(data.map(msg => ({
+        ...msg,
+        sender_name: senderMap.get(msg.sender_id) || 'Unknown'
+      })));
+    } else {
+      setCommunityMessages([]);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !currentUser) return;
+
+    if (activeTab === 'direct' && selectedConversation) {
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: currentUser.id,
+          receiver_id: selectedConversation,
+          content: newMessage.trim()
+        });
+
+      if (error) {
+        toast.error('Failed to send message');
+        return;
+      }
+
+      setNewMessage('');
+      loadMessages(selectedConversation);
+    } else if (activeTab === 'communities' && selectedCommunity) {
+      const { error } = await supabase
+        .from('community_messages')
+        .insert({
+          community_id: selectedCommunity,
+          sender_id: currentUser.id,
+          content: newMessage.trim()
+        });
+
+      if (error) {
+        toast.error('Failed to send message');
+        return;
+      }
+
+      setNewMessage('');
+      loadCommunityMessages(selectedCommunity);
+    }
   };
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const individualConversations = conversations.filter(c => c.type === 'individual');
-  const communityConversations = conversations.filter(c => c.type === 'community');
-
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60);
 
-    if (diffInMinutes < 1) {
-      return 'now';
-    } else if (diffInMinutes < 60) {
-      return `${Math.floor(diffInMinutes)}m`;
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}h`;
-    } else {
-      return `${Math.floor(diffInMinutes / 1440)}d`;
-    }
+    if (diffInMinutes < 1) return 'now';
+    if (diffInMinutes < 60) return `${Math.floor(diffInMinutes)}m`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h`;
+    return `${Math.floor(diffInMinutes / 1440)}d`;
   };
 
   const formatMessageTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const filteredConversations = conversations.filter(c =>
+    c.other_user_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredCommunities = communities.filter(c =>
+    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleBack = () => {
+    setSelectedConversation(null);
+    setSelectedCommunity(null);
+    setMessages([]);
+    setCommunityMessages([]);
   };
 
   if (!isOpen) return null;
 
+  const showConversationList = !selectedConversation && !selectedCommunity;
+  const currentConversation = conversations.find(c => c.id === selectedConversation);
+  const currentCommunity = communities.find(c => c.id === selectedCommunity);
+
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-0 md:p-4">
       <div className="w-full max-w-4xl h-full md:h-[600px] mx-auto bg-background md:rounded-xl overflow-hidden shadow-2xl flex border border-border">
-        {/* Conversations List - Instagram Style */}
-        <div className={`w-full md:w-1/3 border-r border-border bg-background ${selectedConversation ? 'hidden md:block' : 'block'}`}>
+        {/* Conversations/Communities List */}
+        <div className={`w-full md:w-1/3 border-r border-border bg-background ${!showConversationList ? 'hidden md:block' : 'block'}`}>
           {/* Header */}
           <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-3">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
-                    {currentUser?.fullName?.split(' ').map((n: string) => n[0]).join('')}
+                    {currentUser?.fullName?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <h2 className="text-lg md:text-xl font-semibold text-foreground">{currentUser?.fullName?.split(' ')[0]}</h2>
+                <h2 className="text-lg md:text-xl font-semibold text-foreground">{currentUser?.fullName?.split(' ')[0] || 'Messages'}</h2>
               </div>
               <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-muted p-2 text-foreground">
                 <X className="h-5 w-5" />
               </Button>
             </div>
+            
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'direct' | 'communities')} className="mb-3">
+              <TabsList className="w-full grid grid-cols-2">
+                <TabsTrigger value="direct" className="text-sm">
+                  <MessageCircle className="h-4 w-4 mr-1" />
+                  Direct
+                </TabsTrigger>
+                <TabsTrigger value="communities" className="text-sm">
+                  <UsersIcon className="h-4 w-4 mr-1" />
+                  Communities
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Search" 
+                placeholder="Search..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-muted border-border rounded-lg text-foreground placeholder:text-muted-foreground"
               />
             </div>
           </div>
           
-          {/* Conversations */}
-          <ScrollArea className="h-[calc(100vh-120px)] md:h-[490px]">
-            <div className="p-0">
-              {conversations.length === 0 ? (
-                <div className="text-center text-muted-foreground py-12 md:py-16 px-4">
-                  <MessageCircle className="h-10 md:h-12 w-10 md:w-12 mx-auto mb-3 opacity-50" />
-                  <p className="text-base md:text-lg font-medium text-foreground">Your Messages</p>
-                  <p className="text-sm">Send private messages to friends</p>
-                </div>
-              ) : (
-                conversations.map((conversation) => {
-                  const otherUserName = conversation.participantNames.find(name => name !== currentUser.fullName);
-                  const isSelected = selectedConversation === conversation.id;
-                  
-                  return (
+          {/* List */}
+          <ScrollArea className="h-[calc(100vh-200px)] md:h-[400px]">
+            {activeTab === 'direct' ? (
+              <div className="p-0">
+                {filteredConversations.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-12 px-4">
+                    <MessageCircle className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                    <p className="text-base font-medium text-foreground">No Messages Yet</p>
+                    <p className="text-sm">Start a conversation with someone!</p>
+                  </div>
+                ) : (
+                  filteredConversations.map((conversation) => (
                     <div
                       key={conversation.id}
                       onClick={() => {
                         setSelectedConversation(conversation.id);
                         loadMessages(conversation.id);
                       }}
-                      className={`p-3 md:p-4 cursor-pointer transition-all duration-200 hover:bg-muted active:bg-muted/80 ${
-                        isSelected ? 'bg-muted' : ''
-                      }`}
+                      className="p-3 md:p-4 cursor-pointer transition-all duration-200 hover:bg-muted active:bg-muted/80"
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="relative">
-                          <Avatar className="h-12 md:h-14 w-12 md:w-14">
-                            <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
-                              {otherUserName?.split(' ').map(n => n[0]).join('') || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                        </div>
+                        <Avatar className="h-12 w-12">
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
+                            {getInitials(conversation.other_user_name)}
+                          </AvatarFallback>
+                        </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium text-foreground truncate text-sm md:text-base">
-                              {otherUserName}
+                            <p className="font-medium text-foreground truncate text-sm">
+                              {conversation.other_user_name}
                             </p>
                             <div className="flex items-center space-x-2">
                               <span className="text-xs text-muted-foreground">
-                                {formatTime(conversation.lastMessageTime)}
+                                {formatTime(conversation.last_message_time)}
                               </span>
-                              {conversation.unreadCount > 0 && (
+                              {conversation.unread_count > 0 && (
                                 <div className="w-2 h-2 bg-primary rounded-full"></div>
                               )}
                             </div>
                           </div>
-                          <p className="text-xs md:text-sm text-muted-foreground truncate mt-1">
-                            {conversation.lastMessage}
+                          <p className="text-xs text-muted-foreground truncate mt-1">
+                            {conversation.last_message}
                           </p>
                         </div>
                       </div>
                     </div>
-                  );
-                })
-              )}
-            </div>
+                  ))
+                )}
+              </div>
+            ) : (
+              <div className="p-0">
+                {filteredCommunities.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-12 px-4">
+                    <UsersIcon className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                    <p className="text-base font-medium text-foreground">No Communities</p>
+                    <p className="text-sm">Join a skill or activity community!</p>
+                  </div>
+                ) : (
+                  filteredCommunities.map((community) => (
+                    <div
+                      key={community.id}
+                      onClick={() => {
+                        setSelectedCommunity(community.id);
+                        loadCommunityMessages(community.id);
+                      }}
+                      className="p-3 md:p-4 cursor-pointer transition-all duration-200 hover:bg-muted active:bg-muted/80"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+                          <UsersIcon className="h-6 w-6 text-primary-foreground" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground truncate text-sm">
+                            {community.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate mt-1">
+                            {community.description || 'Community chat'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </ScrollArea>
         </div>
 
-        {/* Messages Area - Instagram Style */}
-        <div className={`flex-1 flex flex-col bg-background ${selectedConversation ? 'flex' : 'hidden md:flex'}`}>
-          {selectedConversation ? (
+        {/* Messages Area */}
+        <div className={`flex-1 flex flex-col bg-background ${showConversationList ? 'hidden md:flex' : 'flex'}`}>
+          {(selectedConversation || selectedCommunity) ? (
             <>
               {/* Chat Header */}
               <div className="p-3 md:p-4 border-b border-border bg-background">
@@ -302,21 +474,37 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                       variant="ghost" 
                       size="sm" 
                       className="md:hidden p-2 mr-2 text-foreground hover:bg-muted"
-                      onClick={() => setSelectedConversation(null)}
+                      onClick={handleBack}
                     >
                       <ArrowLeft className="h-5 w-5" />
                     </Button>
-                    <Avatar className="h-8 md:h-10 w-8 md:w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
-                        {conversations.find(c => c.id === selectedConversation)?.participantNames.find(name => name !== currentUser.fullName)?.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold text-foreground text-sm md:text-base">
-                        {conversations.find(c => c.id === selectedConversation)?.participantNames.find(name => name !== currentUser.fullName)}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">Active now</p>
-                    </div>
+                    {selectedConversation ? (
+                      <>
+                        <Avatar className="h-8 md:h-10 w-8 md:w-10">
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
+                            {getInitials(currentConversation?.other_user_name || 'U')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-semibold text-foreground text-sm md:text-base">
+                            {currentConversation?.other_user_name}
+                          </h3>
+                          <p className="text-xs text-muted-foreground">Active now</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="h-8 md:h-10 w-8 md:w-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+                          <UsersIcon className="h-4 w-4 text-primary-foreground" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground text-sm md:text-base">
+                            {currentCommunity?.name}
+                          </h3>
+                          <p className="text-xs text-muted-foreground">Community chat</p>
+                        </div>
+                      </>
+                    )}
                   </div>
                   <div className="flex items-center space-x-1 md:space-x-2">
                     <Button variant="ghost" size="sm" className="hover:bg-muted p-2 text-foreground">
@@ -332,37 +520,69 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                 </div>
               </div>
 
-              {/* Messages - Instagram Style */}
+              {/* Messages */}
               <ScrollArea className="flex-1 px-3 md:px-6 py-3 md:py-4 bg-background">
                 <div className="space-y-3 md:space-y-4">
-                  {messages.map((message, index) => {
-                    const isFromMe = message.senderId === currentUser.id;
-                    const showTime = index === 0 || 
-                      new Date(message.timestamp).getTime() - new Date(messages[index - 1]?.timestamp).getTime() > 300000; // 5 minutes
-                    
-                    return (
-                      <div key={message.id}>
-                        {showTime && (
-                          <div className="text-center text-xs text-muted-foreground mb-3 md:mb-4">
-                            {formatMessageTime(message.timestamp)}
-                          </div>
-                        )}
-                        <div className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[280px] md:max-w-xs lg:max-w-sm px-3 md:px-4 py-2 rounded-2xl ${
-                            isFromMe
-                              ? 'bg-primary text-primary-foreground ml-2 md:ml-4'
-                              : 'bg-muted text-foreground mr-2 md:mr-4'
-                          }`}>
-                            <p className="text-sm leading-relaxed">{message.content}</p>
+                  {selectedConversation ? (
+                    messages.map((message, index) => {
+                      const isFromMe = message.sender_id === currentUser?.id;
+                      const showTime = index === 0 || 
+                        new Date(message.created_at).getTime() - new Date(messages[index - 1]?.created_at).getTime() > 300000;
+                      
+                      return (
+                        <div key={message.id}>
+                          {showTime && (
+                            <div className="text-center text-xs text-muted-foreground mb-3">
+                              {formatMessageTime(message.created_at)}
+                            </div>
+                          )}
+                          <div className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[280px] md:max-w-xs lg:max-w-sm px-3 md:px-4 py-2 rounded-2xl ${
+                              isFromMe
+                                ? 'bg-primary text-primary-foreground ml-2 md:ml-4'
+                                : 'bg-muted text-foreground mr-2 md:mr-4'
+                            }`}>
+                              <p className="text-sm leading-relaxed">{message.content}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  ) : (
+                    communityMessages.map((message, index) => {
+                      const isFromMe = message.sender_id === currentUser?.id;
+                      const showTime = index === 0 || 
+                        new Date(message.created_at).getTime() - new Date(communityMessages[index - 1]?.created_at).getTime() > 300000;
+                      
+                      return (
+                        <div key={message.id}>
+                          {showTime && (
+                            <div className="text-center text-xs text-muted-foreground mb-3">
+                              {formatMessageTime(message.created_at)}
+                            </div>
+                          )}
+                          <div className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[280px] md:max-w-xs lg:max-w-sm ${!isFromMe ? 'mr-2 md:mr-4' : 'ml-2 md:ml-4'}`}>
+                              {!isFromMe && (
+                                <p className="text-xs text-muted-foreground mb-1">{message.sender_name}</p>
+                              )}
+                              <div className={`px-3 md:px-4 py-2 rounded-2xl ${
+                                isFromMe
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'bg-muted text-foreground'
+                              }`}>
+                                <p className="text-sm leading-relaxed">{message.content}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </ScrollArea>
 
-              {/* Message Input - Instagram Style */}
+              {/* Message Input */}
               <div className="p-3 md:p-4 border-t border-border bg-background">
                 <div className="flex items-center space-x-2 md:space-x-3">
                   <div className="flex-1 relative">
@@ -377,7 +597,7 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                       <Button
                         onClick={sendMessage}
                         size="sm"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full h-6 w-6 p-1 touch-manipulation"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full h-6 w-6 p-1"
                       >
                         <Send className="h-3 w-3" />
                       </Button>
@@ -389,13 +609,11 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
           ) : (
             <div className="flex-1 flex items-center justify-center bg-background">
               <div className="text-center">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                  <MessageCircle className="h-12 w-12 text-white" />
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+                  <MessageCircle className="h-12 w-12 text-primary-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Your Messages</h3>
-                <p className="text-gray-500 max-w-sm mx-auto">
-                  Send private messages to friends or groups. Start a conversation now.
-                </p>
+                <h3 className="text-xl font-semibold mb-2 text-foreground">Your Messages</h3>
+                <p className="text-muted-foreground">Select a conversation to start chatting</p>
               </div>
             </div>
           )}

@@ -16,11 +16,33 @@ const AllActivities = () => {
   // Load user-generated activities from database
   useEffect(() => {
     const fetchActivities = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('activities')
-        .select('*, profiles(full_name)')
+        .select('*')
         .order('created_at', { ascending: false });
-      if (data) setDbActivities(data);
+      
+      if (error) {
+        console.error('Error fetching activities:', error);
+        return;
+      }
+      
+      // Fetch profile names for each activity
+      if (data && data.length > 0) {
+        const userIds = [...new Set(data.map(a => a.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', userIds);
+        
+        const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+        const activitiesWithNames = data.map(activity => ({
+          ...activity,
+          owner_name: profileMap.get(activity.user_id) || 'Unknown'
+        }));
+        setDbActivities(activitiesWithNames);
+      } else {
+        setDbActivities([]);
+      }
     };
     fetchActivities();
   }, []);
@@ -230,7 +252,7 @@ const AllActivities = () => {
     isUserActivity: true,
     venue: activity.venue,
     time: activity.time,
-    organizer: activity.profiles?.full_name || 'Anonymous'
+    organizer: activity.owner_name || 'Anonymous'
   }));
 
   const allActivitiesWithUser = [...allActivities, ...convertedDbActivities];

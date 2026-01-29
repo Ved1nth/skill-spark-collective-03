@@ -107,21 +107,65 @@ const Home = () => {
   }, []);
 
   const fetchDbSkills = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('skills')
-      .select('*, profiles(full_name)')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(8);
-    if (data) setDbSkills(data);
+    
+    if (error) {
+      console.error('Error fetching skills:', error);
+      return;
+    }
+    
+    // Fetch profile names for each skill
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map(s => s.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', userIds);
+      
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+      const skillsWithNames = data.map(skill => ({
+        ...skill,
+        owner_name: profileMap.get(skill.user_id) || 'Unknown'
+      }));
+      setDbSkills(skillsWithNames);
+    } else {
+      setDbSkills([]);
+    }
   };
 
   const fetchDbActivities = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('activities')
-      .select('*, profiles(full_name)')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(6);
-    if (data) setDbActivities(data);
+    
+    if (error) {
+      console.error('Error fetching activities:', error);
+      return;
+    }
+    
+    // Fetch profile names for each activity
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map(a => a.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', userIds);
+      
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+      const activitiesWithNames = data.map(activity => ({
+        ...activity,
+        owner_name: profileMap.get(activity.user_id) || 'Unknown'
+      }));
+      setDbActivities(activitiesWithNames);
+    } else {
+      setDbActivities([]);
+    }
   };
 
   const scrollToSkills = () => {
