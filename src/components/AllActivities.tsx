@@ -252,7 +252,8 @@ const AllActivities = () => {
     isUserActivity: true,
     venue: activity.venue,
     time: activity.time,
-    organizer: activity.owner_name || 'Anonymous'
+    organizer: activity.owner_name || 'Anonymous',
+    userId: activity.user_id,
   }));
 
   const allActivitiesWithUser = [...allActivities, ...convertedDbActivities];
@@ -392,7 +393,15 @@ const AllActivities = () => {
                           <div className="mt-2 space-y-1 text-sm text-muted-foreground">
                             {activity.venue && <p>📍 {activity.venue}</p>}
                             {activity.time && <p>🕐 {activity.time}</p>}
-                            <p className="text-xs">Organized by {activity.organizer}</p>
+                            <p 
+                              className="text-xs hover:text-primary cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (activity.userId) navigate(`/user/${activity.userId}`);
+                              }}
+                            >
+                              Organized by {activity.organizer}
+                            </p>
                           </div>
                         ) : (
                           <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-2">
