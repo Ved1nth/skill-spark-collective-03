@@ -68,6 +68,7 @@ const Home = () => {
   // Auth state management
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -78,9 +79,20 @@ const Home = () => {
       } else {
         setProfile(null);
       }
+      
+      // Handle token refresh errors by signing out
+      if (event === 'TOKEN_REFRESHED' && !session) {
+        supabase.auth.signOut();
+      }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Session error:', error);
+        // Clear any stale session data
+        supabase.auth.signOut();
+        return;
+      }
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {

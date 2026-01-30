@@ -324,6 +324,22 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
 
   if (!isOpen) return null;
 
+  // Show message if not authenticated
+  if (!currentUser) {
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-background rounded-xl p-8 max-w-md text-center border border-border">
+          <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Sign In Required</h2>
+          <p className="text-muted-foreground mb-4">Please sign in to access your messages.</p>
+          <Button onClick={onClose} className="plasma-button text-primary-foreground">
+            Close
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const showConversationList = !selectedConversation && !selectedCommunity;
   const currentConversation = conversations.find(c => c.id === selectedConversation);
   const currentCommunity = communities.find(c => c.id === selectedCommunity);
