@@ -11,6 +11,7 @@ import SkillDetail from "./components/SkillDetail";
 import ActivityDetail from "./components/ActivityDetail";
 import AllSkills from "./components/AllSkills";
 import AllActivities from "./components/AllActivities";
+import UserProfile from "./components/UserProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => {
             <Route path="/activities" element={<AllActivities />} />
             <Route path="/skill/:skillId" element={<SkillDetail />} />
             <Route path="/activity/:activityId" element={<ActivityDetail />} />
+            <Route path="/user/:userId" element={<UserProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

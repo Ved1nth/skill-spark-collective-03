@@ -12,6 +12,7 @@ import AddSkillModal from './AddSkillModal';
 import AddActivityModal from './AddActivityModal';
 import NebulaBackground from './NebulaBackground';
 import { toast } from 'sonner';
+import { useMessageNotifications } from '@/hooks/useMessageNotifications';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -282,6 +283,24 @@ const Home = () => {
 
   const userName = profile?.full_name || user?.user_metadata?.full_name || 'User';
 
+  // Enable message notifications when user is logged in
+  useMessageNotifications({ 
+    userId: user?.id || null, 
+    enabled: !!user && !showMessagesModal 
+  });
+
+  // Listen for openMessages event to open the modal
+  useEffect(() => {
+    const handleOpenMessages = () => {
+      setShowMessagesModal(true);
+    };
+
+    window.addEventListener('openMessages', handleOpenMessages);
+    return () => {
+      window.removeEventListener('openMessages', handleOpenMessages);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background relative">
       <NebulaBackground />
@@ -516,8 +535,14 @@ const Home = () => {
                       <Badge className="w-fit mt-2 bg-primary/20 text-primary border-primary/30">
                         {skill.category}
                       </Badge>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        by {skill.profiles?.full_name || 'Anonymous'}
+                      <p 
+                        className="text-xs text-muted-foreground mt-1 hover:text-primary cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (skill.user_id) navigate(`/user/${skill.user_id}`);
+                        }}
+                      >
+                        by {skill.owner_name || 'Anonymous'}
                       </p>
                     </CardHeader>
                   </Card>
@@ -613,8 +638,14 @@ const Home = () => {
                         <p className="text-muted-foreground flex items-center gap-1">
                           <Globe className="h-3 w-3 text-accent" /> {activity.venue}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          Organized by {activity.profiles?.full_name || 'Anonymous'}
+                        <p 
+                          className="text-xs text-muted-foreground hover:text-primary cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (activity.user_id) navigate(`/user/${activity.user_id}`);
+                          }}
+                        >
+                          Organized by {activity.owner_name || 'Anonymous'}
                         </p>
                       </div>
                     </CardContent>

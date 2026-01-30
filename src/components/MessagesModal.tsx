@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, MessageCircle, Send, Phone, Video, Info, Search, ArrowLeft, Users as UsersIcon } from 'lucide-react';
+import { X, MessageCircle, Send, Phone, Video, Info, Search, ArrowLeft, Users as UsersIcon, Plus, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -44,6 +44,12 @@ interface Community {
   member_count?: number;
 }
 
+interface UserSearchResult {
+  user_id: string;
+  full_name: string;
+  department: string | null;
+}
+
 interface MessagesModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -61,13 +67,61 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [profiles, setProfiles] = useState<Map<string, string>>(new Map());
+  const [showNewConversation, setShowNewConversation] = useState(false);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     if (isOpen && currentUser) {
       loadConversations();
       loadCommunities();
+      setShowNewConversation(false);
+      setUserSearchTerm('');
+      setSearchResults([]);
     }
   }, [isOpen, currentUser]);
+
+  // Listen for openMessages event from notifications
+  useEffect(() => {
+    const handleOpenMessages = (event: CustomEvent) => {
+      if (event.detail?.conversationUserId) {
+        setSelectedConversation(event.detail.conversationUserId);
+        loadMessages(event.detail.conversationUserId);
+      }
+    };
+
+    window.addEventListener('openMessages', handleOpenMessages as EventListener);
+    return () => {
+      window.removeEventListener('openMessages', handleOpenMessages as EventListener);
+    };
+  }, []);
+
+  // Search for users
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (!userSearchTerm.trim() || userSearchTerm.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+
+      setIsSearching(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, department')
+        .neq('user_id', currentUser?.id || '')
+        .ilike('full_name', `%${userSearchTerm}%`)
+        .limit(10);
+
+      if (!error && data) {
+        setSearchResults(data);
+      }
+      setIsSearching(false);
+    };
+
+    const debounce = setTimeout(searchUsers, 300);
+    return () => clearTimeout(debounce);
+  }, [userSearchTerm, currentUser]);
 
   // Set up realtime subscription for messages
   useEffect(() => {
@@ -288,6 +342,30 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
     }
   };
 
+  const startNewConversation = async (user: UserSearchResult) => {
+    // Send an initial greeting message
+    const { error } = await supabase
+      .from('messages')
+      .insert({
+        sender_id: currentUser.id,
+        receiver_id: user.user_id,
+        content: `👋 Hi ${user.full_name.split(' ')[0]}!`
+      });
+
+    if (error) {
+      toast.error('Failed to start conversation');
+      return;
+    }
+
+    toast.success(`Started conversation with ${user.full_name}`);
+    setShowNewConversation(false);
+    setUserSearchTerm('');
+    setSearchResults([]);
+    setSelectedConversation(user.user_id);
+    loadMessages(user.user_id);
+    loadConversations();
+  };
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
@@ -340,9 +418,85 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
     );
   }
 
-  const showConversationList = !selectedConversation && !selectedCommunity;
+  const showConversationList = !selectedConversation && !selectedCommunity && !showNewConversation;
   const currentConversation = conversations.find(c => c.id === selectedConversation);
   const currentCommunity = communities.find(c => c.id === selectedCommunity);
+
+  // Render new conversation search panel
+  const renderNewConversationPanel = () => (
+    <div className="flex-1 flex flex-col bg-background">
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setShowNewConversation(false);
+              setUserSearchTerm('');
+              setSearchResults([]);
+            }}
+            className="p-2"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h2 className="text-lg font-semibold text-foreground">New Conversation</h2>
+        </div>
+      </div>
+      
+      <div className="p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search for users..."
+            value={userSearchTerm}
+            onChange={(e) => setUserSearchTerm(e.target.value)}
+            className="pl-10 bg-muted border-border"
+            autoFocus
+          />
+        </div>
+      </div>
+      
+      <ScrollArea className="flex-1 px-4">
+        {isSearching ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>Searching...</p>
+          </div>
+        ) : userSearchTerm.length < 2 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <UserPlus className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p className="text-sm">Type at least 2 characters to search</p>
+          </div>
+        ) : searchResults.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p className="text-sm">No users found</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {searchResults.map((user) => (
+              <div
+                key={user.user_id}
+                onClick={() => startNewConversation(user)}
+                className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted transition-colors"
+              >
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-sm">
+                    {getInitials(user.full_name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <p className="font-medium text-foreground">{user.full_name}</p>
+                  {user.department && (
+                    <p className="text-xs text-muted-foreground">{user.department}</p>
+                  )}
+                </div>
+                <MessageCircle className="h-5 w-5 text-muted-foreground" />
+              </div>
+            ))}
+          </div>
+        )}
+      </ScrollArea>
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-0 md:p-4">
@@ -388,17 +542,32 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                 className="pl-10 bg-muted border-border rounded-lg text-foreground placeholder:text-muted-foreground"
               />
             </div>
+            
+            {/* New Conversation Button */}
+            {activeTab === 'direct' && (
+              <div className="px-4 py-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNewConversation(true)}
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Conversation
+                </Button>
+              </div>
+            )}
           </div>
           
           {/* List */}
-          <ScrollArea className="h-[calc(100vh-200px)] md:h-[400px]">
+          <ScrollArea className="h-[calc(100vh-250px)] md:h-[350px]">
             {activeTab === 'direct' ? (
               <div className="p-0">
                 {filteredConversations.length === 0 ? (
                   <div className="text-center text-muted-foreground py-12 px-4">
                     <MessageCircle className="h-10 w-10 mx-auto mb-3 opacity-50" />
                     <p className="text-base font-medium text-foreground">No Messages Yet</p>
-                    <p className="text-sm">Start a conversation with someone!</p>
+                    <p className="text-sm">Click "New Conversation" to start chatting!</p>
                   </div>
                 ) : (
                   filteredConversations.map((conversation) => (
@@ -478,9 +647,11 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
           </ScrollArea>
         </div>
 
-        {/* Messages Area */}
+        {/* Messages Area or New Conversation Panel */}
         <div className={`flex-1 flex flex-col bg-background ${showConversationList ? 'hidden md:flex' : 'flex'}`}>
-          {(selectedConversation || selectedCommunity) ? (
+          {showNewConversation ? (
+            renderNewConversationPanel()
+          ) : (selectedConversation || selectedCommunity) ? (
             <>
               {/* Chat Header */}
               <div className="p-3 md:p-4 border-b border-border bg-background">
@@ -629,7 +800,14 @@ const MessagesModal = ({ isOpen, onClose, currentUser }: MessagesModalProps) => 
                   <MessageCircle className="h-12 w-12 text-primary-foreground" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2 text-foreground">Your Messages</h3>
-                <p className="text-muted-foreground">Select a conversation to start chatting</p>
+                <p className="text-muted-foreground mb-4">Select a conversation to start chatting</p>
+                <Button
+                  onClick={() => setShowNewConversation(true)}
+                  className="plasma-button text-primary-foreground"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Start New Conversation
+                </Button>
               </div>
             </div>
           )}

@@ -95,6 +95,7 @@ const AllSkills = () => {
       category: skill.category,
       isUserSkill: true,
       ownerName: skill.owner_name || 'Unknown',
+      userId: skill.user_id,
     };
   });
 
@@ -206,7 +207,15 @@ const AllSkills = () => {
                           <CardTitle className="text-lg text-foreground">{skill.name}</CardTitle>
                           <CardDescription className="text-muted-foreground">
                             {(skill as any).isUserSkill ? (
-                              <span className="text-primary/80">By {(skill as any).ownerName}</span>
+                              <span 
+                                className="text-primary/80 hover:text-primary cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if ((skill as any).userId) navigate(`/user/${(skill as any).userId}`);
+                                }}
+                              >
+                                By {(skill as any).ownerName}
+                              </span>
                             ) : (
                               `${skill.count} talented students`
                             )}
