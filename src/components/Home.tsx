@@ -1,4 +1,4 @@
-import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, Moon, Sun, MessageCircle, Plus } from 'lucide-react';
+import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, Moon, Sun, MessageCircle, Plus, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import AddActivityModal from './AddActivityModal';
 import NebulaBackground from './NebulaBackground';
 import { toast } from 'sonner';
 import { useMessageNotifications } from '@/hooks/useMessageNotifications';
+import NotificationCenter from './NotificationCenter';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -342,6 +343,7 @@ const Home = () => {
               
               {user ? (
                 <div className="flex items-center space-x-1 md:space-x-3">
+                  <NotificationCenter userId={user?.id || null} />
                   <Button
                     variant="ghost"
                     size="sm"
@@ -357,6 +359,15 @@ const Home = () => {
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </Badge>
                     )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(`/user/${user?.id}`)}
+                    className="text-muted-foreground hover:text-primary hover:bg-primary/10 p-2"
+                    aria-label="Profile"
+                  >
+                    <UserIcon className="h-4 w-4" />
                   </Button>
                   <div className="hidden md:block text-sm">
                     <span className="text-muted-foreground">Welcome, </span>

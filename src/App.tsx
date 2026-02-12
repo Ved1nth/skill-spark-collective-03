@@ -12,28 +12,21 @@ import ActivityDetail from "./components/ActivityDetail";
 import AllSkills from "./components/AllSkills";
 import AllActivities from "./components/AllActivities";
 import UserProfile from "./components/UserProfile";
+import EditProfile from "./components/EditProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
-    console.log('App component mounted');
-    // Always show splash screen on first load for the intro animation
-    // In a real app, you might want to show this only once per session
     setShowSplash(true);
   }, []);
 
-  console.log('App render - showSplash:', showSplash);
-
   const handleEnterApp = () => {
-    console.log('handleEnterApp called');
     localStorage.setItem('hasSeenApp', 'true');
     setShowSplash(false);
-    console.log('showSplash set to false');
   };
 
   if (showSplash) {
@@ -54,6 +47,7 @@ const App = () => {
             <Route path="/skill/:skillId" element={<SkillDetail />} />
             <Route path="/activity/:activityId" element={<ActivityDetail />} />
             <Route path="/user/:userId" element={<UserProfile />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
