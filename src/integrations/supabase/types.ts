@@ -59,6 +59,30 @@ export type Database = {
         }
         Relationships: []
       }
+      bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       communities: {
         Row: {
           activity_id: string | null
@@ -164,6 +188,8 @@ export type Database = {
       profiles: {
         Row: {
           academic_year: string | null
+          avatar_url: string | null
+          bio: string | null
           created_at: string
           department: string | null
           email: string
@@ -174,6 +200,8 @@ export type Database = {
         }
         Insert: {
           academic_year?: string | null
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           department?: string | null
           email: string
@@ -184,12 +212,44 @@ export type Database = {
         }
         Update: {
           academic_year?: string | null
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           department?: string | null
           email?: string
           full_name?: string
           id?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          target_id?: string
+          target_type?: string
           user_id?: string
         }
         Relationships: []
