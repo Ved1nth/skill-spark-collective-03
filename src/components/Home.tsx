@@ -1,4 +1,4 @@
-import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, Moon, Sun, MessageCircle, Plus, User as UserIcon } from 'lucide-react';
+import { Search, Users, Calendar, Zap, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Globe, TrendingUp, Moon, Sun, MessageCircle, Plus, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,10 +14,11 @@ import NebulaBackground from './NebulaBackground';
 import { toast } from 'sonner';
 import { useMessageNotifications } from '@/hooks/useMessageNotifications';
 import NotificationCenter from './NotificationCenter';
+import CampusPulse from './CampusPulse';
 
 const Home = () => {
   const navigate = useNavigate();
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [showAddSkillModal, setShowAddSkillModal] = useState(false);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
@@ -28,43 +29,19 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dbSkills, setDbSkills] = useState<any[]>([]);
   const [dbActivities, setDbActivities] = useState<any[]>([]);
-  
-  const skills = [
-    { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'bg-blue-100 text-blue-600' },
-    { id: 'graphic-design', name: 'Graphic Design', icon: Palette, count: 103, color: 'bg-orange-100 text-orange-600' },
-    { id: 'writing-services', name: 'Writing & Assignments', icon: PenTool, count: 156, color: 'bg-green-100 text-green-600' },
-    { id: 'video-editing', name: 'Video Editing', icon: Video, count: 78, color: 'bg-red-100 text-red-600' },
-    { id: 'digital-marketing', name: 'Digital Marketing', icon: TrendingUp, count: 92, color: 'bg-pink-100 text-pink-600' },
-    { id: 'photography', name: 'Photography', icon: Camera, count: 89, color: 'bg-purple-100 text-purple-600' },
-    { id: 'music-production', name: 'Music Production', icon: Music, count: 67, color: 'bg-indigo-100 text-indigo-600' },
-    { id: 'voice-over', name: 'Voice Over', icon: Mic, count: 45, color: 'bg-yellow-100 text-yellow-600' },
-  ];
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
 
-  const activities = [
-    {
-      id: 'weekend-hiking',
-      title: 'Weekend Hiking',
-      description: 'Explore nature trails with fellow outdoor enthusiasts',
-      participants: 23,
-      nextEvent: 'This Saturday',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=300&fit=crop'
-    },
-    {
-      id: 'tech-meetup',
-      title: 'Tech Meetup',
-      description: 'Weekly discussions about latest in technology',
-      participants: 45,
-      nextEvent: 'Thursday 7PM',
-      image: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=300&fit=crop'
-    },
-    {
-      id: 'study-groups',
-      title: 'Study Groups',
-      description: 'Collaborative learning sessions across subjects',
-      participants: 78,
-      nextEvent: 'Tomorrow 3PM',
-      image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop'
-    },
+  // The 8 skill categories students can post under (must match AddSkillModal options).
+  // Counts come from the database — never hardcoded.
+  const skillCategories = [
+    { name: 'Programming & Tech', icon: Code },
+    { name: 'Graphics & Design', icon: Palette },
+    { name: 'Writing & Translation', icon: PenTool },
+    { name: 'Video & Animation', icon: Video },
+    { name: 'Music & Audio', icon: Music },
+    { name: 'Digital Marketing', icon: TrendingUp },
+    { name: 'Business', icon: Briefcase },
+    { name: 'Other', icon: Zap },
   ];
 
   // Auth state management
@@ -118,7 +95,23 @@ const Home = () => {
   useEffect(() => {
     fetchDbSkills();
     fetchDbActivities();
+    fetchCategoryCounts();
   }, []);
+
+  const fetchCategoryCounts = async () => {
+    const { data, error } = await supabase.from('skills').select('category');
+
+    if (error) {
+      console.error('Error fetching category counts:', error);
+      return;
+    }
+
+    const counts: Record<string, number> = {};
+    (data || []).forEach(({ category }) => {
+      if (category) counts[category] = (counts[category] || 0) + 1;
+    });
+    setCategoryCounts(counts);
+  };
 
   const fetchDbSkills = async () => {
     const { data, error } = await supabase
@@ -220,6 +213,10 @@ const Home = () => {
     navigate(`/skill/${skillId}`);
   };
 
+  const handleCategoryClick = (categoryName: string) => {
+    navigate(`/skills?category=${encodeURIComponent(categoryName)}`);
+  };
+
   const handleActivityClick = (activityId: string) => {
     navigate(`/activity/${activityId}`);
   };
@@ -240,34 +237,17 @@ const Home = () => {
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchTerm.trim()) {
-      const lowerSearch = searchTerm.toLowerCase();
-      
-      const skillMatch = skills.find(skill => 
-        skill.name.toLowerCase().includes(lowerSearch)
-      );
-      if (skillMatch) {
-        navigate(`/skill/${skillMatch.id}`);
-        setSearchTerm('');
-        return;
-      }
-      
-      const activityMatch = activities.find(activity => 
-        activity.title.toLowerCase().includes(lowerSearch)
-      );
-      if (activityMatch) {
-        navigate(`/activity/${activityMatch.id}`);
-        setSearchTerm('');
-        return;
-      }
-      
-      navigate('/skills');
+      // Search against real data on the skills browser page
+      navigate(`/skills?q=${encodeURIComponent(searchTerm.trim())}`);
       setSearchTerm('');
     }
   };
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    if (!isDarkMode) {
+    const next = !isDarkMode;
+    setIsDarkMode(next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
+    if (next) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
@@ -312,8 +292,9 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Zap className="h-6 w-6 md:h-8 md:w-8 text-primary electric-pulse" />
-              <h1 className="text-xl md:text-2xl font-bold">
+              <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2">
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">GTA</span>
+                <Badge className="hidden sm:inline-flex bg-primary/15 text-primary border-primary/30 text-[10px] md:text-xs tracking-wider">RNSIT</Badge>
               </h1>
             </div>
             
@@ -447,11 +428,11 @@ const Home = () => {
 
         <div className="container mx-auto text-center relative z-10">
           <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Connect Through Skills
+            RNSIT Runs on Skills
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground mb-6 md:mb-8 max-w-2xl mx-auto px-4">
-            Discover talented students, join exciting activities, and build meaningful connections 
-            based on shared interests and complementary skills.
+            The student-run skill exchange for RNS Institute of Technology — find talented
+            RNSITians, offer what you're good at, and team up through campus activities.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 px-4">
             <Button 
@@ -503,21 +484,24 @@ const Home = () => {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {skills.slice(0, 8).map((skill) => {
-              const IconComponent = skill.icon;
+            {skillCategories.map((category) => {
+              const IconComponent = category.icon;
+              const count = categoryCounts[category.name] || 0;
               return (
-                <Card 
-                  key={skill.id} 
+                <Card
+                  key={category.name}
                   className="crystal-card group hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-                  onClick={() => handleSkillClick(skill.id)}
+                  onClick={() => handleCategoryClick(category.name)}
                 >
                   <CardHeader className="pb-2 md:pb-3 relative z-10">
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-all duration-300 shadow-glow">
                       <IconComponent className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                     </div>
-                    <CardTitle className="text-base md:text-lg text-foreground">{skill.name}</CardTitle>
+                    <CardTitle className="text-base md:text-lg text-foreground">{category.name}</CardTitle>
                     <CardDescription className="text-sm text-muted-foreground">
-                      {skill.count} talented students
+                      {count > 0
+                        ? `${count} skill${count === 1 ? '' : 's'} offered`
+                        : 'Be the first to offer'}
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -531,9 +515,10 @@ const Home = () => {
               <h4 className="text-xl font-semibold mb-4 text-foreground">Recently Added by Students</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {dbSkills.slice(0, 4).map((skill) => (
-                  <Card 
-                    key={skill.id} 
+                  <Card
+                    key={skill.id}
                     className="crystal-card group hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                    onClick={() => handleSkillClick(skill.id)}
                   >
                     <CardHeader className="pb-2 md:pb-3 relative z-10">
                       <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-accent/30 to-primary/30 flex items-center justify-center mb-2 md:mb-3 shadow-glow">
@@ -564,6 +549,9 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Campus Pulse — live stats + top contributors */}
+      <CampusPulse />
+
       {/* Activities Section */}
       <section id="activities-section" className="py-8 md:py-12 px-4 relative z-10">
         <div className="container mx-auto">
@@ -591,79 +579,63 @@ const Home = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {activities.map((activity) => (
-              <Card 
-                key={activity.id} 
-                className="crystal-card group hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden"
-                onClick={() => handleActivityClick(activity.id)}
-              >
-                <div className="aspect-video overflow-hidden relative">
-                  <img 
-                    src={activity.image} 
-                    alt={activity.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 opacity-80"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
-                </div>
-                <CardHeader className="relative z-10">
-                  <CardTitle className="text-lg md:text-xl text-foreground">{activity.title}</CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground">{activity.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-0 relative z-10">
-                  <div className="flex items-center justify-between text-xs md:text-sm">
-                    <span className="flex items-center text-muted-foreground">
-                      <Users className="h-3 w-3 md:h-4 md:w-4 mr-1 text-primary" />
-                      {activity.participants} joined
-                    </span>
-                    <Badge className="text-xs bg-accent/20 text-accent border-accent/30">
-                      {activity.nextEvent}
+          {dbActivities.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              {dbActivities.slice(0, 6).map((activity) => (
+                <Card
+                  key={activity.id}
+                  className="crystal-card group hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden"
+                  onClick={() => handleActivityClick(activity.id)}
+                >
+                  <div className="h-24 relative bg-gradient-to-br from-primary/30 via-accent/20 to-primary/10 flex items-center justify-center">
+                    <Calendar className="h-10 w-10 text-primary/70 group-hover:scale-110 transition-all duration-300" />
+                    <Badge className="absolute top-3 right-3 text-xs bg-accent/20 text-accent border-accent/30">
+                      {activity.category}
                     </Badge>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* User-added activities from database */}
-          {dbActivities.length > 0 && (
-            <div className="mt-8">
-              <h4 className="text-xl font-semibold mb-4 text-foreground">Recently Added Events</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {dbActivities.slice(0, 3).map((activity) => (
-                  <Card 
-                    key={activity.id} 
-                    className="crystal-card group hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-                    onClick={() => handleActivityClick(activity.id)}
-                  >
-                    <CardHeader className="relative z-10">
-                      <CardTitle className="text-lg text-foreground">{activity.title}</CardTitle>
-                      <CardDescription className="line-clamp-2 text-muted-foreground">{activity.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-0 relative z-10">
-                      <div className="space-y-2 text-sm">
-                        <Badge className="bg-primary/20 text-primary border-primary/30">{activity.category}</Badge>
-                        <p className="text-muted-foreground flex items-center gap-1">
-                          <Calendar className="h-3 w-3 text-primary" /> {activity.date} at {activity.time}
-                        </p>
-                        <p className="text-muted-foreground flex items-center gap-1">
-                          <Globe className="h-3 w-3 text-accent" /> {activity.venue}
-                        </p>
-                        <p 
-                          className="text-xs text-muted-foreground hover:text-primary cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (activity.user_id) navigate(`/user/${activity.user_id}`);
-                          }}
-                        >
-                          Organized by {activity.owner_name || 'Anonymous'}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                  <CardHeader className="relative z-10">
+                    <CardTitle className="text-lg md:text-xl text-foreground">{activity.title}</CardTitle>
+                    <CardDescription className="text-sm line-clamp-2 text-muted-foreground">{activity.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0 relative z-10">
+                    <div className="space-y-2 text-sm">
+                      <p className="text-muted-foreground flex items-center gap-1">
+                        <Calendar className="h-3 w-3 text-primary" /> {activity.date} at {activity.time}
+                      </p>
+                      <p className="text-muted-foreground flex items-center gap-1">
+                        <Globe className="h-3 w-3 text-accent" /> {activity.venue}
+                      </p>
+                      <p
+                        className="text-xs text-muted-foreground hover:text-primary cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (activity.user_id) navigate(`/user/${activity.user_id}`);
+                        }}
+                      >
+                        Organized by {activity.owner_name || 'Anonymous'}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
+          ) : (
+            <Card className="crystal-card">
+              <CardContent className="py-12 text-center">
+                <Calendar className="h-10 w-10 text-primary/50 mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-foreground mb-2">No campus events yet</h4>
+                <p className="text-muted-foreground mb-4">Be the first RNSITian to organize something.</p>
+                {user ? (
+                  <Button className="plasma-button text-primary-foreground" onClick={() => setShowAddActivityModal(true)}>
+                    <Plus className="h-4 w-4 mr-1" /> Add the First Activity
+                  </Button>
+                ) : (
+                  <Button className="plasma-button text-primary-foreground" onClick={handleSignIn}>
+                    Sign In to Add One
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
       </section>
@@ -677,7 +649,8 @@ const Home = () => {
                 Ready to Connect?
               </h3>
               <p className="text-muted-foreground mb-6 md:mb-8 max-w-xl mx-auto">
-                Join thousands of students who are already building meaningful connections through shared skills and interests.
+                Every RNSITian is good at something. Put your skill on the board, find the
+                people you need, and build things together — all inside campus.
               </p>
               <Button 
                 size="lg" 

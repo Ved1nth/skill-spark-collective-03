@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Code, Camera, Music, Palette, PenTool, Video, Mic, Briefcase, Smartphone, Globe, FileText, TrendingUp, BookOpen, Megaphone, DollarSign, Languages, Calculator, Paintbrush, Headphones, Database, Shield, Zap, Search } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Code, Music, Palette, PenTool, Video, Briefcase, TrendingUp, Zap, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
@@ -16,13 +16,29 @@ const categoryIcons: Record<string, any> = {
   'Music & Audio': Music,
   'Digital Marketing': TrendingUp,
   'Business': Briefcase,
+  'Other': Zap,
 };
+
+const categoryNames = Object.keys(categoryIcons);
 
 const AllSkills = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
   const [dbSkills, setDbSkills] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const selectedCategory = searchParams.get('category') || '';
+
+  const handleCategoryFilter = (category: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (category && category !== selectedCategory) {
+      next.set('category', category);
+    } else {
+      next.delete('category');
+    }
+    setSearchParams(next, { replace: true });
+  };
 
   // Fetch skills from database
   useEffect(() => {
@@ -61,52 +77,30 @@ const AllSkills = () => {
     setLoading(false);
   };
 
-  // Base skills list
-  const baseSkills = [
-    { id: 'web-development', name: 'Web Development', icon: Code, count: 124, color: 'from-blue-500/20 to-cyan-500/20 border-blue-500/30', category: 'Programming & Tech' },
-    { id: 'mobile-apps', name: 'Mobile App Development', icon: Smartphone, count: 87, color: 'from-cyan-500/20 to-teal-500/20 border-cyan-500/30', category: 'Programming & Tech' },
-    { id: 'database-design', name: 'Database Design', icon: Database, count: 56, color: 'from-slate-500/20 to-gray-500/20 border-slate-500/30', category: 'Programming & Tech' },
-    { id: 'cybersecurity', name: 'Cybersecurity', icon: Shield, count: 43, color: 'from-red-500/20 to-orange-500/20 border-red-500/30', category: 'Programming & Tech' },
-    { id: 'ai-ml', name: 'AI & Machine Learning', icon: Zap, count: 71, color: 'from-violet-500/20 to-purple-500/20 border-violet-500/30', category: 'Programming & Tech' },
-    { id: 'graphic-design', name: 'Graphic Design', icon: Palette, count: 103, color: 'from-orange-500/20 to-amber-500/20 border-orange-500/30', category: 'Graphics & Design' },
-    { id: 'logo-design', name: 'Logo Design', icon: Paintbrush, count: 94, color: 'from-pink-500/20 to-rose-500/20 border-pink-500/30', category: 'Graphics & Design' },
-    { id: 'ui-ux', name: 'UI/UX Design', icon: Smartphone, count: 112, color: 'from-teal-500/20 to-emerald-500/20 border-teal-500/30', category: 'Graphics & Design' },
-    { id: 'photography', name: 'Photography', icon: Camera, count: 89, color: 'from-purple-500/20 to-violet-500/20 border-purple-500/30', category: 'Graphics & Design' },
-    { id: 'writing-services', name: 'Writing & Assignments', icon: PenTool, count: 156, color: 'from-green-500/20 to-emerald-500/20 border-green-500/30', category: 'Writing & Translation' },
-    { id: 'content-writing', name: 'Content Writing', icon: FileText, count: 134, color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30', category: 'Writing & Translation' },
-    { id: 'translation', name: 'Translation Services', icon: Languages, count: 65, color: 'from-indigo-500/20 to-violet-500/20 border-indigo-500/30', category: 'Writing & Translation' },
-    { id: 'video-editing', name: 'Video Editing', icon: Video, count: 78, color: 'from-red-500/20 to-pink-500/20 border-red-500/30', category: 'Video & Animation' },
-    { id: 'music-production', name: 'Music Production', icon: Music, count: 67, color: 'from-indigo-500/20 to-blue-500/20 border-indigo-500/30', category: 'Music & Audio' },
-    { id: 'voice-over', name: 'Voice Over', icon: Mic, count: 45, color: 'from-yellow-500/20 to-amber-500/20 border-yellow-500/30', category: 'Music & Audio' },
-    { id: 'digital-marketing', name: 'Digital Marketing', icon: TrendingUp, count: 92, color: 'from-pink-500/20 to-fuchsia-500/20 border-pink-500/30', category: 'Digital Marketing' },
-    { id: 'social-media', name: 'Social Media Marketing', icon: Globe, count: 118, color: 'from-cyan-500/20 to-blue-500/20 border-cyan-500/30', category: 'Digital Marketing' },
-    { id: 'business-consulting', name: 'Business Consulting', icon: Briefcase, count: 74, color: 'from-slate-500/20 to-zinc-500/20 border-slate-500/30', category: 'Business' },
-  ];
-
-  // Convert DB skills to display format and merge with base skills
-  const convertedDbSkills = dbSkills.map((skill) => {
-    const IconComponent = categoryIcons[skill.category] || Code;
+  // All skills come from the database — nothing hardcoded
+  const allSkills = dbSkills.map((skill) => {
+    const IconComponent = categoryIcons[skill.category] || Zap;
     return {
       id: skill.id,
       name: skill.title,
+      description: skill.description,
       icon: IconComponent,
-      count: 1,
       color: 'from-primary/20 to-accent/20 border-primary/30',
-      category: skill.category,
-      isUserSkill: true,
+      category: skill.category || 'Other',
       ownerName: skill.owner_name || 'Unknown',
       userId: skill.user_id,
     };
   });
 
-  // Merge base skills with user-added skills
-  const allSkills = [...baseSkills, ...convertedDbSkills];
-
-  // Filter skills based on search term
-  const filteredSkills = allSkills.filter(skill =>
-    (skill.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (skill.category || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter by category (from URL) and search term
+  const filteredSkills = allSkills.filter(skill => {
+    const matchesCategory = !selectedCategory || skill.category === selectedCategory;
+    const matchesSearch =
+      (skill.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (skill.category || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (skill.ownerName || '').toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   // Group skills by category
   const skillsByCategory = filteredSkills.reduce((acc, skill) => {
@@ -165,9 +159,34 @@ const AllSkills = () => {
             </div>
           </div>
           
+          {/* Category filter chips */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+            <Badge
+              onClick={() => handleCategoryFilter('')}
+              className={`cursor-pointer transition-colors ${!selectedCategory
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/20'}`}
+            >
+              All
+            </Badge>
+            {categoryNames.map((name) => (
+              <Badge
+                key={name}
+                onClick={() => handleCategoryFilter(name)}
+                className={`cursor-pointer transition-colors ${selectedCategory === name
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/20'}`}
+              >
+                {name}
+              </Badge>
+            ))}
+          </div>
+
           <div className="text-center mb-8">
             <p className="text-muted-foreground">
-              Showing {filteredSkills.length} skills across {Object.keys(skillsByCategory).length} categories
+              {selectedCategory
+                ? `${filteredSkills.length} skill${filteredSkills.length === 1 ? '' : 's'} in ${selectedCategory}`
+                : `${filteredSkills.length} skill${filteredSkills.length === 1 ? '' : 's'} offered by RNSIT students`}
             </p>
           </div>
         </div>
@@ -205,26 +224,22 @@ const AllSkills = () => {
                             <IconComponent className="h-6 w-6 text-primary" />
                           </div>
                           <CardTitle className="text-lg text-foreground">{skill.name}</CardTitle>
-                          <CardDescription className="text-muted-foreground">
-                            {(skill as any).isUserSkill ? (
-                              <span 
-                                className="text-primary/80 hover:text-primary cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if ((skill as any).userId) navigate(`/user/${(skill as any).userId}`);
-                                }}
-                              >
-                                By {(skill as any).ownerName}
-                              </span>
-                            ) : (
-                              `${skill.count} talented students`
-                            )}
-                          </CardDescription>
-                          {(skill as any).isUserSkill && (
-                            <Badge className="mt-2 bg-accent/20 text-accent border-accent/30 text-xs">
-                              User Added
-                            </Badge>
+                          {skill.description && (
+                            <CardDescription className="text-muted-foreground line-clamp-2">
+                              {skill.description}
+                            </CardDescription>
                           )}
+                          <CardDescription className="text-muted-foreground">
+                            <span
+                              className="text-primary/80 hover:text-primary cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (skill.userId) navigate(`/user/${skill.userId}`);
+                              }}
+                            >
+                              By {skill.ownerName}
+                            </span>
+                          </CardDescription>
                         </CardHeader>
                       </Card>
                     );
@@ -239,15 +254,28 @@ const AllSkills = () => {
       {/* Empty State */}
       {!loading && filteredSkills.length === 0 && (
         <div className="text-center py-12 relative z-10">
-          <h3 className="text-xl font-semibold mb-2 text-foreground">No skills found</h3>
+          <h3 className="text-xl font-semibold mb-2 text-foreground">
+            {allSkills.length === 0 ? 'No skills posted yet' : 'No skills found'}
+          </h3>
           <p className="text-muted-foreground mb-4">
-            Try adjusting your search term or browse all categories
+            {allSkills.length === 0
+              ? 'Be the first RNSITian to put a skill on the board.'
+              : selectedCategory
+                ? `Nothing in ${selectedCategory} yet — be the first to offer.`
+                : 'Try adjusting your search term or browse all categories'}
           </p>
-          <Button 
-            onClick={() => setSearchTerm('')}
+          <Button
+            onClick={() => {
+              if (allSkills.length === 0) {
+                navigate('/');
+              } else {
+                setSearchTerm('');
+                handleCategoryFilter('');
+              }
+            }}
             className="plasma-button text-primary-foreground"
           >
-            Clear Search
+            {allSkills.length === 0 ? 'Back to Home' : 'Clear Filters'}
           </Button>
         </div>
       )}

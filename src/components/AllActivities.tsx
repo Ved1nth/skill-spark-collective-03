@@ -1,31 +1,47 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Calendar, MapPin, Clock, Mountain, Code, BookOpen, Palette, Music, Camera, Dumbbell, Coffee, Gamepad2, Globe, Heart, TreePine, Microscope } from 'lucide-react';
+import { ArrowLeft, Calendar, Globe, Code, BookOpen, Palette, Dumbbell, Coffee, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import NebulaBackground from './NebulaBackground';
+
+// Must match the category options in AddActivityModal
+const categoryIcons: Record<string, any> = {
+  'Academic': BookOpen,
+  'Sports': Dumbbell,
+  'Technology': Code,
+  'Arts & Culture': Palette,
+  'Social': Coffee,
+  'Career': Briefcase,
+  'Other': Calendar,
+};
+
+const categories = ['All', ...Object.keys(categoryIcons)];
 
 const AllActivities = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [dbActivities, setDbActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load user-generated activities from database
+  // Load activities from database — all events on this page are real
   useEffect(() => {
     const fetchActivities = async () => {
       const { data, error } = await supabase
         .from('activities')
         .select('*')
         .order('created_at', { ascending: false });
-      
+
       if (error) {
         console.error('Error fetching activities:', error);
+        setLoading(false);
         return;
       }
-      
+
       // Fetch profile names for each activity
       if (data && data.length > 0) {
         const userIds = [...new Set(data.map(a => a.user_id))];
@@ -33,7 +49,7 @@ const AllActivities = () => {
           .from('profiles')
           .select('user_id, full_name')
           .in('user_id', userIds);
-        
+
         const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
         const activitiesWithNames = data.map(activity => ({
           ...activity,
@@ -43,265 +59,47 @@ const AllActivities = () => {
       } else {
         setDbActivities([]);
       }
+      setLoading(false);
     };
     fetchActivities();
   }, []);
 
-  // Comprehensive activities and events list
-  const allActivities = [
-    // Outdoor & Adventure
-    {
-      id: 'weekend-hiking',
-      title: 'Weekend Hiking',
-      description: 'Explore nature trails with fellow outdoor enthusiasts',
-      participants: 156,
-      upcomingEvents: 3,
-      nextEvent: 'This Saturday',
-      category: 'Outdoor & Adventure',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=300&fit=crop',
-      icon: Mountain
-    },
-    {
-      id: 'rock-climbing',
-      title: 'Rock Climbing Club',
-      description: 'Indoor and outdoor climbing for all skill levels',
-      participants: 89,
-      upcomingEvents: 2,
-      nextEvent: 'Friday 7PM',
-      category: 'Outdoor & Adventure',
-      image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop',
-      icon: Mountain
-    },
-    {
-      id: 'camping-trips',
-      title: 'Camping Adventures',
-      description: 'Weekend camping trips and wilderness experiences',
-      participants: 67,
-      upcomingEvents: 1,
-      nextEvent: 'Next Weekend',
-      category: 'Outdoor & Adventure',
-      image: 'https://images.unsplash.com/photo-1504851149312-7a075b496cc7?w=400&h=300&fit=crop',
-      icon: TreePine
-    },
-
-    // Technology & Innovation
-    {
-      id: 'tech-meetup',
-      title: 'Tech Meetup',
-      description: 'Weekly discussions about latest in technology',
-      participants: 234,
-      upcomingEvents: 4,
-      nextEvent: 'Thursday 7PM',
-      category: 'Technology & Innovation',
-      image: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=300&fit=crop',
-      icon: Code
-    },
-    {
-      id: 'hackathons',
-      title: 'Hackathon Events',
-      description: '24-hour coding challenges and innovation competitions',
-      participants: 187,
-      upcomingEvents: 2,
-      nextEvent: 'Next Month',
-      category: 'Technology & Innovation',
-      image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=300&fit=crop',
-      icon: Code
-    },
-    {
-      id: 'ai-workshops',
-      title: 'AI & ML Workshops',
-      description: 'Hands-on workshops in artificial intelligence and machine learning',
-      participants: 145,
-      upcomingEvents: 3,
-      nextEvent: 'Wednesday 6PM',
-      category: 'Technology & Innovation',
-      image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=300&fit=crop',
-      icon: Code
-    },
-
-    // Academic & Learning
-    {
-      id: 'study-groups',
-      title: 'Study Groups',
-      description: 'Collaborative learning sessions across subjects',
-      participants: 298,
-      upcomingEvents: 8,
-      nextEvent: 'Tomorrow 3PM',
-      category: 'Academic & Learning',
-      image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop',
-      icon: BookOpen
-    },
-    {
-      id: 'research-symposium',
-      title: 'Research Symposium',
-      description: 'Present and discuss ongoing research projects',
-      participants: 134,
-      upcomingEvents: 1,
-      nextEvent: 'Next Friday',
-      category: 'Academic & Learning',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop',
-      icon: Microscope
-    },
-    {
-      id: 'language-exchange',
-      title: 'Language Exchange',
-      description: 'Practice languages with native speakers',
-      participants: 112,
-      upcomingEvents: 5,
-      nextEvent: 'Daily 6PM',
-      category: 'Academic & Learning',
-      image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&h=300&fit=crop',
-      icon: Globe
-    },
-
-    // Arts & Creativity
-    {
-      id: 'art-workshops',
-      title: 'Art Workshops',
-      description: 'Painting, drawing, and creative expression sessions',
-      participants: 78,
-      upcomingEvents: 2,
-      nextEvent: 'Sunday 2PM',
-      category: 'Arts & Creativity',
-      image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop',
-      icon: Palette
-    },
-    {
-      id: 'music-sessions',
-      title: 'Music Jam Sessions',
-      description: 'Collaborative music making and performance opportunities',
-      participants: 94,
-      upcomingEvents: 3,
-      nextEvent: 'Saturday 7PM',
-      category: 'Arts & Creativity',
-      image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
-      icon: Music
-    },
-    {
-      id: 'photography-walks',
-      title: 'Photography Walks',
-      description: 'Explore the city while practicing photography skills',
-      participants: 56,
-      upcomingEvents: 2,
-      nextEvent: 'Sunday 9AM',
-      category: 'Arts & Creativity',
-      image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=300&fit=crop',
-      icon: Camera
-    },
-
-    // Health & Fitness
-    {
-      id: 'fitness-groups',
-      title: 'Fitness Groups',
-      description: 'Group workouts, yoga, and wellness activities',
-      participants: 201,
-      upcomingEvents: 6,
-      nextEvent: 'Every Morning',
-      category: 'Health & Fitness',
-      image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
-      icon: Dumbbell
-    },
-    {
-      id: 'mental-health',
-      title: 'Mental Health Support',
-      description: 'Peer support groups and wellness workshops',
-      participants: 167,
-      upcomingEvents: 4,
-      nextEvent: 'Tuesday 5PM',
-      category: 'Health & Fitness',
-      image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop',
-      icon: Heart
-    },
-
-    // Social & Entertainment
-    {
-      id: 'coffee-meetups',
-      title: 'Coffee Meetups',
-      description: 'Casual networking and social gatherings',
-      participants: 145,
-      upcomingEvents: 5,
-      nextEvent: 'Every Day 4PM',
-      category: 'Social & Entertainment',
-      image: 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=400&h=300&fit=crop',
-      icon: Coffee
-    },
-    {
-      id: 'game-nights',
-      title: 'Game Nights',
-      description: 'Board games, video games, and friendly competitions',
-      participants: 123,
-      upcomingEvents: 3,
-      nextEvent: 'Friday 8PM',
-      category: 'Social & Entertainment',
-      image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=300&fit=crop',
-      icon: Gamepad2
-    },
-  ];
-
-  // Convert database activities to display format
-  const convertedDbActivities = dbActivities.map((activity) => ({
-    id: `db-${activity.id}`,
-    title: activity.title || 'Untitled Activity',
-    description: activity.description || 'No description available',
-    participants: 1,
-    upcomingEvents: 1,
-    nextEvent: activity.date || 'TBD',
-    category: activity.category || 'User Activities',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=300&fit=crop',
-    icon: Calendar,
-    isUserActivity: true,
-    venue: activity.venue,
-    time: activity.time,
-    organizer: activity.owner_name || 'Anonymous',
-    userId: activity.user_id,
-  }));
-
-  const allActivitiesWithUser = [...allActivities, ...convertedDbActivities];
-
-  const categories = ['All', ...Array.from(new Set(allActivitiesWithUser.map(activity => activity.category)))];
-
   // Filter activities based on search term and category
-  const filteredActivities = allActivitiesWithUser.filter(activity => {
+  const filteredActivities = dbActivities.filter(activity => {
     const matchesSearch = (activity.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (activity.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (activity.category || '').toLowerCase().includes(searchTerm.toLowerCase());
+                         (activity.venue || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || activity.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  // Group activities by category for display
-  const activitiesByCategory = filteredActivities.reduce((acc, activity) => {
-    if (!acc[activity.category]) {
-      acc[activity.category] = [];
-    }
-    acc[activity.category].push(activity);
-    return acc;
-  }, {} as Record<string, typeof allActivitiesWithUser>);
-
   const handleActivityClick = (activityId: string) => {
-    if (!activityId.startsWith('db-')) {
-      navigate(`/activity/${activityId}`);
-    }
+    navigate(`/activity/${activityId}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-soft">
+    <div className="min-h-screen bg-background relative">
+      <NebulaBackground />
+
       {/* Header */}
-      <header className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-50">
+      <header className="glass-header sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 onClick={() => navigate('/')}
+                className="text-foreground/70 hover:text-foreground hover:bg-primary/10"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Home
               </Button>
               <div>
-                <h1 className="text-2xl font-bold">All Activities & Events</h1>
-                <p className="text-muted-foreground">Join communities and participate in exciting events</p>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Campus Activities & Events
+                </h1>
+                <p className="text-muted-foreground text-sm">Everything happening at RNSIT, organized by students</p>
               </div>
             </div>
           </div>
@@ -309,134 +107,130 @@ const AllActivities = () => {
       </header>
 
       {/* Search and Filter Section */}
-      <section className="py-8 px-4">
+      <section className="py-8 px-4 relative z-10">
         <div className="container mx-auto">
           <div className="max-w-md mx-auto mb-6">
             <Input
-              placeholder="Search activities or events..."
+              placeholder="Search events, venues..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="text-center"
+              className="text-center bg-card/50 backdrop-blur-sm border-primary/20 focus:border-primary/50"
             />
           </div>
-          
+
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2 justify-center mb-8">
             {categories.map((category) => (
-              <Button
+              <Badge
                 key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
                 onClick={() => setSelectedCategory(category)}
-                className={selectedCategory === category ? "gradient-electric text-primary-foreground" : ""}
+                className={`cursor-pointer transition-colors ${selectedCategory === category
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/20'}`}
               >
                 {category}
-              </Button>
+              </Badge>
             ))}
           </div>
-          
-          <div className="text-center mb-8">
-            <p className="text-muted-foreground">
-              Showing {filteredActivities.length} activities across {Object.keys(activitiesByCategory).length} categories
-            </p>
-          </div>
-        </div>
-      </section>
 
-      {/* Activities by Category */}
-      <section className="pb-12 px-4">
-        <div className="container mx-auto">
-          {Object.entries(activitiesByCategory).map(([category, activities]) => (
-            <div key={category} className="mb-12">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">{category}</h2>
-                <Badge variant="secondary" className="text-sm">
-                  {activities.length} activities
-                </Badge>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activities.map((activity: any) => {
-                  const IconComponent = activity.icon;
-                  return (
-                    <Card 
-                      key={activity.id}
-                      className={`group hover:shadow-lg transition-smooth overflow-hidden border-border/50 hover:border-primary/20 ${!activity.isUserActivity ? 'cursor-pointer' : ''}`}
-                      onClick={() => handleActivityClick(activity.id)}
-                    >
-                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 relative overflow-hidden">
-                        <img 
-                          src={activity.image} 
-                          alt={activity.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-smooth"
-                        />
-                        <div className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm px-2 py-1 rounded-full text-sm font-medium">
-                          {activity.participants} members
-                        </div>
-                        <div className="absolute bottom-3 left-3">
-                          <div className={`w-8 h-8 rounded-lg bg-primary/20 backdrop-blur-sm flex items-center justify-center`}>
-                            <IconComponent className="h-4 w-4 text-primary" />
-                          </div>
-                        </div>
-                      </div>
-                      <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                          {activity.title}
-                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                            {activity.nextEvent}
-                          </span>
-                        </CardTitle>
-                        <CardDescription>
-                          {activity.description}
-                        </CardDescription>
-                        {activity.isUserActivity ? (
-                          <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                            {activity.venue && <p>📍 {activity.venue}</p>}
-                            {activity.time && <p>🕐 {activity.time}</p>}
-                            <p 
-                              className="text-xs hover:text-primary cursor-pointer"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (activity.userId) navigate(`/user/${activity.userId}`);
-                              }}
-                            >
-                              Organized by {activity.organizer}
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-2">
-                            <div className="flex items-center">
-                              <Users className="h-4 w-4 mr-1" />
-                              {activity.participants} members
-                            </div>
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-1" />
-                              {activity.upcomingEvents} events
-                            </div>
-                          </div>
-                        )}
-                      </CardHeader>
-                    </Card>
-                  );
-                })}
-              </div>
+          {!loading && (
+            <div className="text-center mb-8">
+              <p className="text-muted-foreground">
+                {selectedCategory === 'All'
+                  ? `${filteredActivities.length} event${filteredActivities.length === 1 ? '' : 's'} organized by RNSIT students`
+                  : `${filteredActivities.length} event${filteredActivities.length === 1 ? '' : 's'} in ${selectedCategory}`}
+              </p>
             </div>
-          ))}
+          )}
         </div>
       </section>
 
-      {/* Empty State */}
-      {filteredActivities.length === 0 && (
-        <div className="text-center py-12">
-          <h3 className="text-xl font-semibold mb-2">No activities found</h3>
-          <p className="text-muted-foreground mb-4">
-            Try adjusting your search term or browse different categories
-          </p>
-          <Button onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}>
-            Clear Filters
-          </Button>
+      {/* Activities Grid */}
+      <section className="pb-12 px-4 relative z-10">
+        <div className="container mx-auto">
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading events...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredActivities.map((activity) => {
+                const IconComponent = categoryIcons[activity.category] || Calendar;
+                return (
+                  <Card
+                    key={activity.id}
+                    className="crystal-card group hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden"
+                    onClick={() => handleActivityClick(activity.id)}
+                  >
+                    <div className="h-24 relative bg-gradient-to-br from-primary/30 via-accent/20 to-primary/10 flex items-center justify-center">
+                      <IconComponent className="h-10 w-10 text-primary/70 group-hover:scale-110 transition-all duration-300" />
+                      <Badge className="absolute top-3 right-3 text-xs bg-accent/20 text-accent border-accent/30">
+                        {activity.category}
+                      </Badge>
+                    </div>
+                    <CardHeader className="relative z-10">
+                      <CardTitle className="text-lg text-foreground">{activity.title}</CardTitle>
+                      <CardDescription className="line-clamp-2 text-muted-foreground">
+                        {activity.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0 relative z-10">
+                      <div className="space-y-2 text-sm">
+                        <p className="text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3 text-primary" /> {activity.date} at {activity.time}
+                        </p>
+                        {activity.venue && (
+                          <p className="text-muted-foreground flex items-center gap-1">
+                            <Globe className="h-3 w-3 text-accent" /> {activity.venue}
+                          </p>
+                        )}
+                        <p
+                          className="text-xs text-muted-foreground hover:text-primary cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (activity.user_id) navigate(`/user/${activity.user_id}`);
+                          }}
+                        >
+                          Organized by {activity.owner_name || 'Anonymous'}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && filteredActivities.length === 0 && (
+            <div className="text-center py-12">
+              <Calendar className="h-10 w-10 text-primary/50 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2 text-foreground">
+                {dbActivities.length === 0 ? 'No campus events yet' : 'No events found'}
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                {dbActivities.length === 0
+                  ? 'Be the first RNSITian to organize something — add an event from the home page.'
+                  : 'Try adjusting your search term or browse different categories'}
+              </p>
+              <Button
+                onClick={() => {
+                  if (dbActivities.length === 0) {
+                    navigate('/');
+                  } else {
+                    setSearchTerm('');
+                    setSelectedCategory('All');
+                  }
+                }}
+                className="plasma-button text-primary-foreground"
+              >
+                {dbActivities.length === 0 ? 'Back to Home' : 'Clear Filters'}
+              </Button>
+            </div>
+          )}
         </div>
-      )}
+      </section>
     </div>
   );
 };
