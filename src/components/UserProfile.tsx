@@ -122,10 +122,10 @@ const UserProfile = () => {
     const colors: Record<string, string> = {
       'Graphics & Design': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
       'Programming & Tech': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      'Digital Marketing': 'bg-pink-500/20 text-pink-400 border-pink-500/30',
+      'Digital Marketing': 'bg-sky-500/20 text-sky-400 border-sky-500/30',
       'Writing & Translation': 'bg-green-500/20 text-green-400 border-green-500/30',
       'Video & Animation': 'bg-red-500/20 text-red-400 border-red-500/30',
-      'Music & Audio': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+      'Music & Audio': 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
       'Sports': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     };
     return colors[category] || 'bg-muted text-muted-foreground border-border';
