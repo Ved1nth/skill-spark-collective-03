@@ -1,73 +1,101 @@
-# Welcome to your Lovable project
+# ⚡ GTA (Go To App) — RNSIT Student Skill Exchange
 
-## Project info
+A full-stack web platform where students of **RNS Institute of Technology, Bengaluru** offer their skills, organize campus activities, and connect with each other — the campus's go-to app for student talent.
 
-**URL**: https://lovable.dev/projects/b89e8fc2-04cf-4daa-bf7d-ea108b23a949
+Think **Fiverr × Discord × BookMyShow × LinkedIn — for one campus**: a skill marketplace, community chat, event listings, and student profiles in a single platform.
 
-## How can I edit this code?
+## What it does
 
-There are several ways of editing your application.
+Every student is good at something — poster design, DSA doubt-solving, video editing, event photography. GTA puts that on a shared board:
 
-**Use Lovable**
+- **Offer a skill** — post what you're good at, with category, experience level, rate, and availability
+- **Find talent** — browse and search skills by category, view student profiles, read reviews
+- **Organize activities** — create campus events with date, time, venue, and capacity
+- **Connect** — direct messages between students, plus community group chats
+- **Reviews & bookmarks** — rate skills you've used, save the ones you'll need later
+- **Campus Pulse** — live campus stats and a Top Contributors leaderboard computed in real time from actual platform data
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b89e8fc2-04cf-4daa-bf7d-ea108b23a949) and start prompting.
+## Tech stack
 
-Changes made via Lovable will be committed automatically to this repo.
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Vite |
+| UI | Tailwind CSS, shadcn/ui (Radix primitives), Framer Motion |
+| Backend | Supabase (PostgreSQL, Auth, Row Level Security) |
+| Data fetching | Supabase JS client, TanStack Query |
+| Routing | React Router v6 |
 
-**Use your preferred IDE**
+## Architecture
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+React SPA (Vite + TypeScript)
+        │
+        │  @supabase/supabase-js
+        ▼
+Supabase (managed PostgreSQL)
+├── Auth        — email/password sessions, JWT
+├── Database    — 8 tables (below)
+└── RLS         — per-row security policies on every table
 ```
 
-**Edit a file directly in GitHub**
+### Database schema
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| Table | Purpose |
+|---|---|
+| `profiles` | Student profile: name, bio, avatar, department, academic year |
+| `skills` | Skills offered: title, description, category, experience, rate |
+| `activities` | Campus events: date, time, venue, capacity, requirements |
+| `messages` | 1-to-1 direct messages with read status |
+| `communities` | Interest-based groups |
+| `community_members` | Group membership |
+| `community_messages` | Group chat messages |
+| `reviews` | Ratings + comments on skills |
+| `bookmarks` | Saved skills per user |
 
-**Use GitHub Codespaces**
+**Security:** every table is protected by PostgreSQL Row Level Security — users can read public content but can only insert/update/delete rows they own (`auth.uid() = user_id`). The frontend ships only the public anon key; all authorization is enforced in the database, not the client.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Running locally
 
-## What technologies are used for this project?
+Requires Node.js 18+.
 
-This project is built with:
+```sh
+git clone https://github.com/Ved1nth/skill-spark-collective-03.git
+cd skill-spark-collective-03
+npm install
+npm run dev        # → http://localhost:8080
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Environment variables (already in `.env`):
 
-## How can I deploy this project?
+```
+VITE_SUPABASE_URL             — Supabase project URL
+VITE_SUPABASE_PUBLISHABLE_KEY — public anon key (safe to expose; RLS enforces access)
+VITE_SUPABASE_PROJECT_ID      — Supabase project id
+```
 
-Simply open [Lovable](https://lovable.dev/projects/b89e8fc2-04cf-4daa-bf7d-ea108b23a949) and click on Share -> Publish.
+Other scripts: `npm run build` (production build), `npm run lint` (ESLint).
 
-## Can I connect a custom domain to my Lovable project?
+## Project structure
 
-Yes, you can!
+```
+src/
+├── pages/            # Route-level pages (Auth, NotFound)
+├── components/       # App screens & features
+│   ├── Home.tsx          # Landing: categories, Campus Pulse, activities
+│   ├── AllSkills.tsx     # Skill browser with search + category filters
+│   ├── AllActivities.tsx # Event browser
+│   ├── SkillDetail.tsx   # Skill page: reviews, bookmarks, contact
+│   ├── ActivityDetail.tsx# Event page: details, message organizer
+│   ├── CampusPulse.tsx   # Live stats + contributor leaderboard
+│   ├── MessagesModal.tsx # DMs + community group chat
+│   └── ui/               # shadcn/ui primitives
+├── integrations/supabase/  # Client + generated DB types
+└── hooks/            # Shared hooks (notifications, toasts)
+supabase/
+└── migrations/       # SQL schema migrations (tables + RLS policies)
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Team
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Built by **Vedanth** — RNS Institute of Technology, Bengaluru.
+<!-- Add teammates, USNs, and guide name here before submission -->

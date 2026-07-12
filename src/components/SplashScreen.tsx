@@ -42,16 +42,16 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
         transition={{ duration: 0.7, ease: "easeInOut" }}
       >
         {/* Deep void background */}
-        <div className="absolute inset-0 bg-[#0a0612]">
+        <div className="absolute inset-0 bg-[#060a14]">
           {/* Animated gradient overlay */}
-          <motion.div 
+          <motion.div
             className="absolute inset-0"
             animate={{
               background: [
-                'radial-gradient(ellipse at 30% 20%, hsl(280 70% 15% / 0.8) 0%, transparent 50%)',
-                'radial-gradient(ellipse at 70% 80%, hsl(280 70% 15% / 0.8) 0%, transparent 50%)',
-                'radial-gradient(ellipse at 30% 80%, hsl(280 70% 15% / 0.8) 0%, transparent 50%)',
-                'radial-gradient(ellipse at 30% 20%, hsl(280 70% 15% / 0.8) 0%, transparent 50%)',
+                'radial-gradient(ellipse at 30% 20%, hsl(220 70% 15% / 0.8) 0%, transparent 50%)',
+                'radial-gradient(ellipse at 70% 80%, hsl(220 70% 15% / 0.8) 0%, transparent 50%)',
+                'radial-gradient(ellipse at 30% 80%, hsl(220 70% 15% / 0.8) 0%, transparent 50%)',
+                'radial-gradient(ellipse at 30% 20%, hsl(220 70% 15% / 0.8) 0%, transparent 50%)',
               ]
             }}
             transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
@@ -62,7 +62,7 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
         <motion.div 
           className="absolute w-[70vw] h-[70vw] rounded-full blur-[120px]"
           style={{
-            background: 'radial-gradient(circle, hsl(280 80% 50% / 0.4), transparent 60%)',
+            background: 'radial-gradient(circle, hsl(217 80% 50% / 0.4), transparent 60%)',
             top: '-25%',
             left: '-25%',
           }}
@@ -94,7 +94,7 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
         <motion.div 
           className="absolute w-[50vw] h-[50vw] rounded-full blur-[90px]"
           style={{
-            background: 'radial-gradient(circle, hsl(320 75% 45% / 0.3), transparent 60%)',
+            background: 'radial-gradient(circle, hsl(200 75% 45% / 0.3), transparent 60%)',
             top: '30%',
             right: '20%',
           }}
@@ -116,7 +116,7 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
                 top: `${particle.y}%`,
                 width: particle.size,
                 height: particle.size,
-                background: `radial-gradient(circle, hsl(${280 + Math.random() * 60} 80% 70%), transparent)`,
+                background: `radial-gradient(circle, hsl(${195 + Math.random() * 45} 80% 70%), transparent)`,
               }}
               animate={{
                 y: [0, -30, 0],
@@ -145,7 +145,7 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
               key={i}
               className="absolute w-[2px] h-[40vh] origin-bottom"
               style={{
-                background: 'linear-gradient(to top, hsl(280 85% 65% / 0.6), transparent)',
+                background: 'linear-gradient(to top, hsl(217 90% 61% / 0.6), transparent)',
                 transform: `rotate(${i * 30}deg)`,
               }}
               animate={{
@@ -175,37 +175,37 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
           <div 
             className="w-64 h-64 rounded-full blur-xl"
             style={{
-              background: 'radial-gradient(circle, hsl(280 85% 65% / 0.4), transparent 70%)',
+              background: 'radial-gradient(circle, hsl(217 90% 61% / 0.4), transparent 70%)',
             }}
           />
         </motion.div>
 
         {/* Main content */}
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen">
-          {/* Letter container with perspective */}
-          <div className="flex items-center justify-center space-x-2 md:space-x-6 perspective-1000">
+          {/* Word container with perspective */}
+          <div className="flex items-center justify-center space-x-2 md:space-x-5 perspective-1000">
             {/* G */}
             <motion.div
               initial={{ opacity: 0, y: 100, rotateX: -90, scale: 0.5 }}
-              animate={phase >= 1 ? { 
-                opacity: 1, 
-                y: 0, 
-                rotateX: 0, 
+              animate={phase >= 1 ? {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
                 scale: 1,
               } : {}}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <motion.span 
-                className="text-7xl md:text-9xl font-black bg-gradient-to-br from-violet-400 via-purple-500 to-violet-600 bg-clip-text text-transparent"
+              <motion.span
+                className="text-7xl md:text-9xl font-black bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent"
                 style={{
-                  filter: 'drop-shadow(0 0 40px hsl(280 85% 65% / 0.8))',
-                  textShadow: '0 0 60px hsl(280 85% 65% / 0.5)',
+                  filter: 'drop-shadow(0 0 40px hsl(217 90% 61% / 0.8))',
+                  textShadow: '0 0 60px hsl(217 90% 61% / 0.5)',
                 }}
                 animate={{
                   filter: [
-                    'drop-shadow(0 0 30px hsl(280 85% 65% / 0.6))',
-                    'drop-shadow(0 0 60px hsl(280 85% 65% / 0.9))',
-                    'drop-shadow(0 0 30px hsl(280 85% 65% / 0.6))',
+                    'drop-shadow(0 0 30px hsl(217 90% 61% / 0.6))',
+                    'drop-shadow(0 0 60px hsl(217 90% 61% / 0.9))',
+                    'drop-shadow(0 0 30px hsl(217 90% 61% / 0.6))',
                   ],
                 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -217,25 +217,25 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
             {/* T */}
             <motion.div
               initial={{ opacity: 0, y: 100, rotateX: -90, scale: 0.5 }}
-              animate={phase >= 2 ? { 
-                opacity: 1, 
-                y: 0, 
-                rotateX: 0, 
+              animate={phase >= 2 ? {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
                 scale: 1,
               } : {}}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <motion.span 
-                className="text-7xl md:text-9xl font-black bg-gradient-to-br from-pink-400 via-rose-500 to-pink-600 bg-clip-text text-transparent"
+              <motion.span
+                className="text-7xl md:text-9xl font-black bg-gradient-to-br from-cyan-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent"
                 style={{
-                  filter: 'drop-shadow(0 0 40px hsl(320 80% 55% / 0.8))',
-                  textShadow: '0 0 60px hsl(320 80% 55% / 0.5)',
+                  filter: 'drop-shadow(0 0 40px hsl(190 90% 50% / 0.8))',
+                  textShadow: '0 0 60px hsl(190 90% 50% / 0.5)',
                 }}
                 animate={{
                   filter: [
-                    'drop-shadow(0 0 30px hsl(320 80% 55% / 0.6))',
-                    'drop-shadow(0 0 60px hsl(320 80% 55% / 0.9))',
-                    'drop-shadow(0 0 30px hsl(320 80% 55% / 0.6))',
+                    'drop-shadow(0 0 30px hsl(190 90% 50% / 0.6))',
+                    'drop-shadow(0 0 60px hsl(190 90% 50% / 0.9))',
+                    'drop-shadow(0 0 30px hsl(190 90% 50% / 0.6))',
                   ],
                 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
@@ -247,25 +247,25 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
             {/* A */}
             <motion.div
               initial={{ opacity: 0, y: 100, rotateX: -90, scale: 0.5 }}
-              animate={phase >= 3 ? { 
-                opacity: 1, 
-                y: 0, 
-                rotateX: 0, 
+              animate={phase >= 3 ? {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
                 scale: 1,
               } : {}}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <motion.span 
-                className="text-7xl md:text-9xl font-black bg-gradient-to-br from-cyan-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent"
+              <motion.span
+                className="text-7xl md:text-9xl font-black bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent"
                 style={{
-                  filter: 'drop-shadow(0 0 40px hsl(185 70% 50% / 0.8))',
-                  textShadow: '0 0 60px hsl(185 70% 50% / 0.5)',
+                  filter: 'drop-shadow(0 0 40px hsl(205 90% 55% / 0.8))',
+                  textShadow: '0 0 60px hsl(205 90% 55% / 0.5)',
                 }}
                 animate={{
                   filter: [
-                    'drop-shadow(0 0 30px hsl(185 70% 50% / 0.6))',
-                    'drop-shadow(0 0 60px hsl(185 70% 50% / 0.9))',
-                    'drop-shadow(0 0 30px hsl(185 70% 50% / 0.6))',
+                    'drop-shadow(0 0 30px hsl(205 90% 55% / 0.6))',
+                    'drop-shadow(0 0 60px hsl(205 90% 55% / 0.9))',
+                    'drop-shadow(0 0 30px hsl(205 90% 55% / 0.6))',
                   ],
                 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
@@ -288,7 +288,7 @@ const SplashScreen = ({ onEnterApp }: SplashScreenProps) => {
               animate={phase >= 4 ? { y: 0, opacity: 1 } : {}}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              CONNECT THROUGH SKILLS
+              RNSIT&apos;S GO-TO APP FOR SKILLS
             </motion.p>
             
             {/* Animated underline */}
