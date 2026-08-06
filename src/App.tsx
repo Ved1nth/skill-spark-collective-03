@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import SplashScreen from "./components/SplashScreen";
 import Home from "./components/Home";
 import Auth from "./pages/Auth";
+import OAuthConsent from "./pages/OAuthConsent";
 import SkillDetail from "./components/SkillDetail";
 import ActivityDetail from "./components/ActivityDetail";
 import AllSkills from "./components/AllSkills";
@@ -42,6 +43,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/skills" element={<AllSkills />} />
             <Route path="/activities" element={<AllActivities />} />
             <Route path="/skill/:skillId" element={<SkillDetail />} />
