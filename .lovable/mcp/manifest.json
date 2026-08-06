@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://amuzfybqeoszyjvxzbpz.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "skill-spark-collective-03",
+      "version": "0.1.0",
+      "title": "skill-spark-collective-03"
+    },
+    "tools": [
+      {
+        "name": "list_skills",
+        "title": "List skills",
+        "description": "List skill listings offered by students, newest first. Optionally filter by category.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "category": {
+              "description": "Category to filter by, e.g. 'Web Development'.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max number of listings to return (default 20).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "search_skills",
+        "title": "Search skills",
+        "description": "Search skill listings by keyword across title, description, and category.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Keyword to search for, e.g. 'react' or 'photography'."
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_skill",
+        "title": "Get skill details",
+        "description": "Get a single skill listing by ID, including the owner's profile and its reviews.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The skill listing ID (UUID)."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_activities",
+        "title": "List activities",
+        "description": "List campus activities and events, newest first. Optionally filter by category.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "category": {
+              "description": "Category to filter by, e.g. 'Workshop'.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max number of activities to return (default 20).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_my_profile",
+        "title": "Get my profile",
+        "description": "Get the signed-in user's profile, including name, department, and academic year.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_skill",
+        "title": "Create skill listing",
+        "description": "Create a new skill listing offered by the signed-in user.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Skill title, e.g. 'React tutoring'."
+            },
+            "category": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Skill category, e.g. 'Web Development'."
+            },
+            "description": {
+              "description": "What the user offers and for whom.",
+              "type": "string"
+            },
+            "experience": {
+              "description": "Experience level, e.g. 'Intermediate'.",
+              "type": "string"
+            },
+            "hourly_rate": {
+              "description": "Hourly rate as text, e.g. '200' for ₹200/hr.",
+              "type": "string"
+            },
+            "availability": {
+              "description": "Availability, e.g. 'Weekends'.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "title",
+            "category"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

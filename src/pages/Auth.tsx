@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Mail, Lock, User, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,10 @@ import NebulaBackground from '@/components/NebulaBackground';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Only allow same-origin relative redirect targets.
+  const rawNext = searchParams.get('next') ?? '';
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/';
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('signin');
   
@@ -27,18 +31,18 @@ const Auth = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        navigate('/');
+        navigate(next);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        navigate('/');
+        navigate(next);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, next]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +62,7 @@ const Auth = () => {
         }
       } else {
         toast.success('Signed in successfully!');
-        navigate('/');
+        navigate(next);
       }
     } catch (error) {
       toast.error('An unexpected error occurred');
@@ -88,7 +92,7 @@ const Auth = () => {
         email: signUpData.email,
         password: signUpData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}${next}`,
           data: {
             full_name: signUpData.fullName,
             department: signUpData.department,
@@ -105,7 +109,7 @@ const Auth = () => {
         }
       } else {
         toast.success('Account created successfully!');
-        navigate('/');
+        navigate(next);
       }
     } catch (error) {
       toast.error('An unexpected error occurred');
